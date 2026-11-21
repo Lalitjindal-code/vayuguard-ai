@@ -4,33 +4,105 @@
 
 @layer base {
   body {
-    background-color: #090E14;
+    background-color: #06090E;
     color: #F1F5F9;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   }
 }
 
+/* Neo-Brutalist Technical Grid Background */
+.bg-grid-pattern {
+  background-size: 28px 28px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+.bg-dot-matrix {
+  background-image: radial-gradient(rgba(16, 185, 129, 0.15) 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+}
+
+/* Severe Hazard Caution Diagonal Stripes */
+.bg-hazard-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(239, 68, 68, 0.18),
+    rgba(239, 68, 68, 0.18) 12px,
+    rgba(153, 27, 27, 0.28) 12px,
+    rgba(153, 27, 27, 0.28) 24px
+  );
+}
+
+.bg-safe-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(16, 185, 129, 0.12),
+    rgba(16, 185, 129, 0.12) 12px,
+    rgba(5, 150, 105, 0.2) 12px,
+    rgba(5, 150, 105, 0.2) 24px
+  );
+}
+
+/* Custom Neo-Brutalist Hard Shadows */
+.brutal-shadow {
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.brutal-shadow-sm {
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.brutal-shadow-emerald {
+  box-shadow: 4px 4px 0px 0px #10B981;
+}
+
+.brutal-shadow-cyan {
+  box-shadow: 4px 4px 0px 0px #06B6D4;
+}
+
+.brutal-shadow-amber {
+  box-shadow: 4px 4px 0px 0px #F59E0B;
+}
+
+.brutal-shadow-red {
+  box-shadow: 4px 4px 0px 0px #EF4444;
+}
+
+/* Tactile Button Click Mechanics */
+.brutal-btn {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.brutal-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+.brutal-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px #000000;
+}
+
 /* Custom Accessibility Focus Rings */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #090E14, 0 0 0 4px #10B981;
+  box-shadow: 0 0 0 2px #06090E, 0 0 0 5px #10B981 !important;
 }
 
-/* Custom Scrollbar for sleek dark mode */
+/* Technical Sleek Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090E14;
+  background: #06090E;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #263447;
-  border-radius: 9999px;
+  background: #1E293B;
+  border: 1px solid #06090E;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #10B981;
 }

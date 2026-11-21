@@ -34,7 +34,7 @@ export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
     {
       id: 'welcome',
       sender: 'assistant',
-      text: `Namaste! I am your **VayuGuard Smog Copilot**, grounded in your live ${telemetry.city} air quality (AQI ${telemetry.aqi} ${telemetry.severity}) and family profile. Ask me any follow-up questions on school commutes, DIY filter builds, or community action!`,
+      text: `Namaste! I am your **VayuGuard Smog Copilot**, grounded in live ${telemetry.city} air quality (CPCB AQI ${telemetry.aqi} ${telemetry.severity}) and your family profile. Ask any follow-up questions on safe outdoor hours, DIY filter builds, or community action!`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -90,29 +90,29 @@ export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
   return (
     <aside
       aria-labelledby="copilot-heading"
-      className="bg-surface border border-subtle rounded-2xl shadow-xl overflow-hidden"
+      className="bg-[#0C121B] border-2 border-slate-700 rounded-xl shadow-xl overflow-hidden brutal-shadow"
     >
       {/* Accordion Toggle Header */}
-      <div className="p-4 flex items-center justify-between border-b border-subtle">
+      <div className="p-4 flex items-center justify-between border-b-2 border-slate-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-            <MessageSquare className="w-4 h-4" aria-hidden="true" />
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 brutal-shadow-sm font-mono font-bold">
+            <MessageSquare className="w-4 h-4 stroke-[2.5]" aria-hidden="true" />
           </div>
           <div>
-            <h2 id="copilot-heading" className="text-sm font-bold text-slate-100 flex items-center gap-2">
+            <h2 id="copilot-heading" className="text-sm font-extrabold uppercase tracking-wide text-white flex items-center gap-2">
               Context-Aware Smog Copilot
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950/40 text-cyan-300 border border-cyan-800/40 font-normal">
-                Grounded in {telemetry.city} AQI
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/60 font-normal">
+                [CPCB::{telemetry.city}]
               </span>
             </h2>
-            <p className="text-xs text-slate-400">Instant answers for winter exposure & society actions</p>
+            <p className="text-xs text-slate-400 font-mono">Instant answers for winter exposure & society actions</p>
           </div>
         </div>
 
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="p-1.5 rounded-lg bg-elevated border border-subtle text-slate-300 hover:text-slate-100 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
+          className="p-1.5 rounded-lg bg-slate-900 border-2 border-slate-700 text-slate-300 hover:text-white brutal-shadow-sm brutal-btn"
           aria-expanded={isOpen}
           aria-label={isOpen ? 'Collapse Smog Copilot Chat' : 'Expand Smog Copilot Chat'}
         >
@@ -130,7 +130,7 @@ export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
                 type="button"
                 onClick={() => handleSend(chip)}
                 disabled={isLoading}
-                className="text-[11px] px-2.5 py-1 rounded-full bg-elevated border border-subtle text-slate-300 hover:border-emerald-500/50 hover:text-emerald-300 transition-colors text-left focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:opacity-50"
+                className="text-[11px] px-3 py-1 rounded-lg bg-slate-900 border-2 border-slate-700 text-slate-300 hover:border-emerald-400 hover:text-emerald-300 transition-colors text-left font-mono font-semibold brutal-btn disabled:opacity-50"
               >
                 <Sparkles className="w-3 h-3 inline mr-1 text-emerald-400" aria-hidden="true" />
                 {chip}
@@ -152,34 +152,34 @@ export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
                 }`}
               >
                 {msg.sender === 'assistant' && (
-                  <div className="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
-                    <Bot className="w-3.5 h-3.5" aria-hidden="true" />
+                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5 border-2 border-emerald-500/50 brutal-shadow-sm font-bold">
+                    <Bot className="w-4 h-4" aria-hidden="true" />
                   </div>
                 )}
 
                 <div
                   className={`p-3 rounded-xl max-w-[85%] leading-relaxed ${
                     msg.sender === 'user'
-                      ? 'bg-emerald-500/20 text-emerald-100 border border-emerald-500/30 rounded-tr-none'
-                      : 'bg-elevated text-slate-200 border border-subtle rounded-tl-none whitespace-pre-line'
+                      ? 'bg-emerald-500/20 text-emerald-100 border-2 border-emerald-500/40 brutal-shadow-sm font-sans'
+                      : 'bg-[#111824] text-slate-200 border-2 border-slate-700 brutal-shadow-sm whitespace-pre-line font-sans'
                   }`}
                 >
                   <p>{msg.text}</p>
-                  <span className="block text-[10px] text-slate-500 mt-1 text-right font-mono">
+                  <span className="block text-[10px] text-slate-500 mt-1 text-right font-mono font-bold">
                     {msg.timestamp}
                   </span>
                 </div>
 
                 {msg.sender === 'user' && (
-                  <div className="w-6 h-6 rounded-md bg-slate-800 text-slate-300 flex items-center justify-center flex-shrink-0 mt-0.5 border border-slate-700">
-                    <User className="w-3.5 h-3.5" aria-hidden="true" />
+                  <div className="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center flex-shrink-0 mt-0.5 border-2 border-slate-700 brutal-shadow-sm font-bold">
+                    <User className="w-4 h-4" aria-hidden="true" />
                   </div>
                 )}
               </div>
             ))}
 
             {isLoading && (
-              <div className="flex items-center gap-2 text-slate-400 text-xs py-1">
+              <div className="flex items-center gap-2 text-slate-400 text-xs py-1 font-mono">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-400" aria-hidden="true" />
                 <span>Smog Copilot is formulating evidence-based guidance...</span>
               </div>
@@ -187,7 +187,7 @@ export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
           </div>
 
           {/* Input Form */}
-          <form onSubmit={onSubmitForm} className="flex items-center gap-2 pt-2 border-t border-subtle">
+          <form onSubmit={onSubmitForm} className="flex items-center gap-2 pt-2 border-t-2 border-slate-800">
             <label htmlFor="copilot-query-input" className="sr-only">
               Ask Smog Copilot
             </label>
@@ -199,12 +199,12 @@ export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
               onChange={(e) => setInput(e.target.value)}
               disabled={isLoading}
               maxLength={300}
-              className="flex-1 px-3 py-2 text-xs bg-elevated border border-subtle rounded-xl text-slate-100 placeholder-slate-500 focus:border-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400 transition-colors"
+              className="flex-1 px-3 py-2 text-xs font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-emerald-400 brutal-shadow-sm"
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="p-2 rounded-xl bg-emerald-400 text-slate-950 hover:bg-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
+              className="p-2 rounded-lg bg-emerald-400 text-slate-950 border-2 border-emerald-500 hover:bg-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed brutal-shadow-sm brutal-btn"
               aria-label="Send message"
             >
               <Send className="w-4 h-4" />

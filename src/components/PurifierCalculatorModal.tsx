@@ -40,11 +40,11 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
       aria-labelledby="purifier-modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
     >
-      <div className="w-full max-w-2xl bg-surface border border-subtle rounded-2xl shadow-2xl p-6 relative my-8">
+      <div className="w-full max-w-2xl bg-[#0C121B] border-2 border-slate-700 rounded-xl brutal-shadow p-6 relative my-8">
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-elevated transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
+          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
           aria-label="Close purifier calculator"
         >
           <X className="w-5 h-5" />
@@ -52,23 +52,23 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
-            <Wrench className="w-5 h-5" aria-hidden="true" />
+          <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border-2 border-cyan-400 flex items-center justify-center text-cyan-400 brutal-shadow-sm font-bold">
+            <Wrench className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />
           </div>
           <div>
-            <h2 id="purifier-modal-title" className="text-lg font-bold text-slate-100 font-sans">
+            <h2 id="purifier-modal-title" className="text-base font-extrabold uppercase tracking-wide text-white font-sans">
               DIY Box-Fan & HEPA Purifier CADR Calculator
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400 font-mono">
               Corsi-Rosenthal clean air calculations tailored to your room volume
             </p>
           </div>
         </div>
 
         {/* Room Dimension Inputs */}
-        <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-elevated/70 border border-subtle mb-5">
+        <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-[#111824] border-2 border-slate-800 mb-5">
           <div>
-            <label htmlFor="room-length" className="block text-xs font-semibold text-slate-300 mb-1">
+            <label htmlFor="room-length" className="block text-xs font-bold uppercase tracking-wider text-slate-200 mb-1 font-mono">
               Length (feet)
             </label>
             <input
@@ -78,11 +78,11 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
               max={35}
               value={length}
               onChange={(e) => setLength(Number(e.target.value) || 6)}
-              className="w-full px-3 py-1.5 text-xs bg-black/40 border border-subtle rounded-lg text-slate-100 font-mono focus:border-cyan-400 focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="w-full px-3 py-1.5 text-xs font-mono font-bold bg-slate-900 border-2 border-slate-700 rounded-lg text-white focus:border-cyan-400 brutal-shadow-sm"
             />
           </div>
           <div>
-            <label htmlFor="room-width" className="block text-xs font-semibold text-slate-300 mb-1">
+            <label htmlFor="room-width" className="block text-xs font-bold uppercase tracking-wider text-slate-200 mb-1 font-mono">
               Width (feet)
             </label>
             <input
@@ -92,12 +92,12 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
               max={35}
               value={width}
               onChange={(e) => setWidth(Number(e.target.value) || 6)}
-              className="w-full px-3 py-1.5 text-xs bg-black/40 border border-subtle rounded-lg text-slate-100 font-mono focus:border-cyan-400 focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="w-full px-3 py-1.5 text-xs font-mono font-bold bg-slate-900 border-2 border-slate-700 rounded-lg text-white focus:border-cyan-400 brutal-shadow-sm"
             />
           </div>
           <div>
-            <label htmlFor="room-height" className="block text-xs font-semibold text-slate-300 mb-1">
-              Ceiling Height (ft)
+            <label htmlFor="room-height" className="block text-xs font-bold uppercase tracking-wider text-slate-200 mb-1 font-mono">
+              Ceiling (feet)
             </label>
             <input
               id="room-height"
@@ -106,76 +106,76 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
               max={15}
               value={height}
               onChange={(e) => setHeight(Number(e.target.value) || 8)}
-              className="w-full px-3 py-1.5 text-xs bg-black/40 border border-subtle rounded-lg text-slate-100 font-mono focus:border-cyan-400 focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="w-full px-3 py-1.5 text-xs font-mono font-bold bg-slate-900 border-2 border-slate-700 rounded-lg text-white focus:border-cyan-400 brutal-shadow-sm"
             />
           </div>
         </div>
 
         {/* Calculated Specs */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          <div className="p-3 rounded-xl bg-elevated border border-subtle text-center">
-            <span className="block text-[11px] text-slate-400">Room Volume</span>
-            <span className="text-base font-bold font-mono text-slate-100">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5 font-mono">
+          <div className="p-3 rounded-lg bg-slate-900 border-2 border-slate-700 text-center brutal-shadow-sm">
+            <span className="block text-[10px] uppercase font-bold text-slate-400">Room Volume</span>
+            <span className="text-base font-black text-white">
               {result.roomVolumeCuFt} <span className="text-xs font-normal">cu.ft</span>
             </span>
           </div>
-          <div className="p-3 rounded-xl bg-elevated border border-subtle text-center">
-            <span className="block text-[11px] text-slate-400">Required CADR</span>
-            <span className="text-base font-bold font-mono text-cyan-400">
+          <div className="p-3 rounded-lg bg-slate-900 border-2 border-cyan-500/60 text-center brutal-shadow-cyan">
+            <span className="block text-[10px] uppercase font-bold text-slate-400">Required CADR</span>
+            <span className="text-base font-black text-cyan-400">
               {result.requiredCadrCfm} <span className="text-xs font-normal">CFM</span>
             </span>
           </div>
-          <div className="p-3 rounded-xl bg-elevated border border-subtle text-center">
-            <span className="block text-[11px] text-slate-400">Target ACH</span>
-            <span className="text-base font-bold font-mono text-emerald-400">
+          <div className="p-3 rounded-lg bg-slate-900 border-2 border-emerald-500/60 text-center brutal-shadow-emerald">
+            <span className="block text-[10px] uppercase font-bold text-slate-400">Target ACH</span>
+            <span className="text-base font-black text-emerald-400">
               {result.achRating}x / hr
             </span>
           </div>
-          <div className="p-3 rounded-xl bg-elevated border border-subtle text-center">
-            <span className="block text-[11px] text-slate-400">Filters Needed</span>
-            <span className="text-base font-bold font-mono text-amber-400">
+          <div className="p-3 rounded-lg bg-slate-900 border-2 border-amber-500/60 text-center brutal-shadow-amber">
+            <span className="block text-[10px] uppercase font-bold text-slate-400">Filters Needed</span>
+            <span className="text-base font-black text-amber-400">
               {result.recommendedFilters}x MERV-13
             </span>
           </div>
         </div>
 
         {/* Cost Comparison: Commercial vs DIY */}
-        <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-950/30 via-elevated to-cyan-950/20 border border-emerald-500/30 mb-5">
+        <div className="p-4 rounded-xl bg-[#101726] border-2 border-emerald-400/80 brutal-shadow-emerald mb-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-semibold text-slate-300 block">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 block font-mono">
                 Cost Comparison for {result.roomAreaSqFt} sq.ft room
               </span>
               <div className="flex items-center gap-4 mt-1 font-mono">
-                <span className="text-xs text-red-400 line-through">
+                <span className="text-xs text-red-400 line-through font-bold">
                   Commercial: ₹{result.commercialCostInr.toLocaleString('en-IN')}
                 </span>
-                <span className="text-sm font-bold text-emerald-400">
+                <span className="text-sm font-black text-emerald-400">
                   DIY Build: ₹{result.diyCostInr.toLocaleString('en-IN')}
                 </span>
               </div>
             </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/20 border-2 border-emerald-400 text-emerald-300 text-xs font-extrabold font-mono brutal-shadow-sm">
               <Sparkles className="w-4 h-4 text-emerald-400" aria-hidden="true" />
-              Save ₹{result.savingsInr.toLocaleString('en-IN')} (90% Cheaper!)
+              SAVE ₹{result.savingsInr.toLocaleString('en-IN')} (90% CHEAPER)
             </div>
           </div>
         </div>
 
         {/* Step-by-Step Instructions */}
-        <div className="p-4 rounded-xl bg-elevated/50 border border-subtle space-y-2 text-xs text-slate-300">
+        <div className="p-4 rounded-xl bg-slate-900 border-2 border-slate-700 space-y-2 text-xs text-slate-300 brutal-shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-slate-200">Assembly Instructions (5 Minutes):</span>
+            <span className="font-extrabold uppercase tracking-wider text-white font-mono text-[11px]">Assembly Instructions (5 Minutes):</span>
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-700 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-bold font-mono uppercase text-white border-2 border-slate-600 brutal-btn"
             >
-              {copiedSteps ? <Check className="w-3 h-3 text-emerald-400" /> : <ArrowRight className="w-3 h-3" />}
-              {copiedSteps ? 'Copied to Clipboard!' : 'Copy Build Specs'}
+              {copiedSteps ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <ArrowRight className="w-3.5 h-3.5" />}
+              {copiedSteps ? 'COPIED!' : 'COPY SPECS'}
             </button>
           </div>
-          <ol className="list-decimal list-inside space-y-1 text-slate-400 leading-relaxed">
+          <ol className="list-decimal list-inside space-y-1 text-slate-400 leading-relaxed font-sans">
             <li>Buy one 20-inch domestic box fan (~₹1,200) and {result.recommendedFilters} MERV-13 filter(s).</li>
             <li>Place the filter on the rear suction side with airflow arrow pointing into fan blades.</li>
             <li>Use duct tape to seal all 4 perimeter edges so air cannot leak around the frame.</li>

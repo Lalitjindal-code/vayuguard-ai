@@ -146,7 +146,7 @@ export const App: React.FC = () => {
   }, [actionPlan, adoptedIds]);
 
   return (
-    <div className="min-h-screen bg-canvas text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#070B10] bg-grid-pattern text-slate-100 flex flex-col font-sans selection:bg-emerald-400 selection:text-slate-950">
       {/* Semantic Landmark: Header */}
       <AqiHeader
         telemetry={telemetry}
@@ -206,22 +206,22 @@ export const App: React.FC = () => {
       </main>
 
       {/* Semantic Landmark: Footer */}
-      <footer className="border-t border-subtle bg-surface/80 py-6 mt-12 text-xs text-slate-400">
+      <footer className="border-t-2 border-slate-800 bg-[#06090E]/95 py-6 mt-12 text-xs text-slate-400 font-mono">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-1 text-center sm:text-left">
-            <p className="font-semibold text-slate-300">
+            <p className="font-bold text-slate-200 uppercase tracking-wider">
               VayuGuard AI — Built for PromptWars Challenge 6 (Urban Air Quality Assistant)
             </p>
-            <p className="text-[11px] text-slate-500">
-              Strictly engineered with TypeScript Strict Mode, WCAG 2.1 AA accessibility, Open-Meteo live hourly telemetry, and Gemini 2.5 Flash GenAI.
+            <p className="text-[11px] text-slate-500 font-sans">
+              Neo-Brutalist Architecture • TypeScript Strict Mode • WCAG 2.1 AA • CPCB Indian NAQI • Dual-Mode GenAI
             </p>
           </div>
-          <div className="flex items-center gap-4 text-[11px]">
-            <span className="text-emerald-400">● Open-Meteo Real Data</span>
+          <div className="flex items-center gap-3 text-[11px] font-bold font-mono">
+            <span className="text-emerald-400">[CPCB_NAQI_LIVE]</span>
             <span className="text-slate-600">|</span>
-            <span className="text-cyan-400">● Gemini 2.5 Flash</span>
+            <span className="text-cyan-400">[GEMINI_2.5_FLASH]</span>
             <span className="text-slate-600">|</span>
-            <span className="text-slate-300">● 100% Client-Side Privacy</span>
+            <span className="text-slate-300">[CLIENT_SIDE_PRIVACY]</span>
           </div>
         </div>
       </footer>

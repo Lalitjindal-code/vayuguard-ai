@@ -29,7 +29,7 @@ export const RwaActionKitModal: React.FC<RwaActionKitModalProps> = ({
           ? `📢 *सोसाइटी महत्वपूर्ण सूचना: शीतकालीन स्मॉग एवं स्वास्थ्य सुरक्षा*
 
 आदरणीय निवासियों,
-हमारे शहर ${telemetry.city} में आज वायु गुणवत्ता सूचकांक (AQI) *${telemetry.aqi}* (${telemetry.severity === 'Severe' ? 'गंभीर' : telemetry.severity}) पर पहुंच गया है।
+हमारे शहर ${telemetry.city} में आज वायु गुणवत्ता सूचकांक (CPCB AQI) *${telemetry.aqi}* (${telemetry.severity === 'Severe' ? 'गंभीर' : telemetry.severity}) पर पहुंच गया है।
 
 ठंड और विंटर इन्वर्जन (Thermal Inversion) के कारण जमीन का धुआं ऊपर नहीं जा पा रहा है।
 
@@ -43,7 +43,7 @@ export const RwaActionKitModal: React.FC<RwaActionKitModalProps> = ({
           : `📢 *URGENT RWA NOTICE: Severe Winter Smog & Health Protection*
 
 Dear Residents,
-The Air Quality Index (AQI) in ${telemetry.city} has reached *${telemetry.aqi} (${telemetry.severity})* today.
+The Air Quality Index (CPCB AQI) in ${telemetry.city} has reached *${telemetry.aqi} (${telemetry.severity})* today.
 
 Due to winter thermal inversion, dense ground-level smoke and toxic PM2.5 are trapped below breathing height.
 
@@ -117,11 +117,11 @@ Please reply with your Block/Flat number and daily route to match with nearby fa
       aria-labelledby="rwa-modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
     >
-      <div className="w-full max-w-xl bg-surface border border-subtle rounded-2xl shadow-2xl p-6 relative my-8">
+      <div className="w-full max-w-xl bg-[#0C121B] border-2 border-slate-700 rounded-xl brutal-shadow p-6 relative my-8">
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-elevated transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
+          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
           aria-label="Close RWA Kit"
         >
           <X className="w-5 h-5" />
@@ -129,34 +129,34 @@ Please reply with your Block/Flat number and daily route to match with nearby fa
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-            <MessageSquare className="w-5 h-5" aria-hidden="true" />
+          <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 brutal-shadow-sm font-bold">
+            <MessageSquare className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />
           </div>
           <div>
-            <h2 id="rwa-modal-title" className="text-lg font-bold text-slate-100 font-sans">
+            <h2 id="rwa-modal-title" className="text-base font-extrabold uppercase tracking-wide text-white font-sans">
               Shareable RWA & Community Action Kit
             </h2>
-            <p className="text-xs text-slate-400">
-              One-click notices grounded in live {telemetry.city} AQI ({telemetry.aqi})
+            <p className="text-xs text-slate-400 font-mono">
+              One-click notices grounded in live {telemetry.city} CPCB AQI ({telemetry.aqi})
             </p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-2 pb-3 border-b border-subtle">
+        <div className="flex items-center gap-2 pb-3 border-b-2 border-slate-800">
           {[
-            { id: 'whatsapp', label: 'WhatsApp Society Notice' },
-            { id: 'guards', label: 'Security & Staff Directive' },
+            { id: 'whatsapp', label: 'WhatsApp Notice' },
+            { id: 'guards', label: 'Staff Directive' },
             { id: 'carpool', label: 'Carpool Template' },
           ].map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as 'whatsapp' | 'guards' | 'carpool')}
-              className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+              className={`px-3 py-1.5 text-xs font-bold font-mono uppercase rounded-lg border-2 transition-all brutal-btn ${
                 activeTab === tab.id
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-semibold'
-                  : 'bg-elevated text-slate-400 hover:text-slate-200'
+                  ? 'bg-emerald-500/25 border-emerald-400 text-emerald-200 brutal-shadow-emerald'
+                  : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'
               }`}
             >
               {tab.label}
@@ -165,20 +165,20 @@ Please reply with your Block/Flat number and daily route to match with nearby fa
         </div>
 
         {/* Notice Preview Box */}
-        <div className="mt-4 p-4 rounded-xl bg-black/40 border border-subtle font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed max-h-80 overflow-y-auto">
+        <div className="mt-4 p-4 rounded-xl bg-slate-950 border-2 border-slate-700 font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed max-h-80 overflow-y-auto brutal-shadow-sm">
           {currentNotice.text}
         </div>
 
         {/* Copy Button */}
-        <div className="flex items-center justify-between mt-4 pt-3 border-t border-subtle">
-          <span className="text-xs text-slate-400">Ready to paste into your society WhatsApp group</span>
+        <div className="flex items-center justify-between mt-4 pt-3 border-t-2 border-slate-800">
+          <span className="text-xs text-slate-400 font-mono">Ready to paste in WhatsApp</span>
           <button
             type="button"
             onClick={handleCopy}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black font-mono uppercase text-slate-950 bg-emerald-400 border-2 border-emerald-500 hover:bg-emerald-300 brutal-shadow-emerald brutal-btn"
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? 'Copied to Clipboard!' : 'Copy Notice'}</span>
+            <span>{copied ? 'COPIED!' : 'COPY NOTICE'}</span>
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Calendar,
   Check,
@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Info,
 } from 'lucide-react';
+import gsap from 'gsap';
 import {
   PersonalizedActionPlan,
   RecommendationCategory,
@@ -30,6 +31,19 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
   onCategoryChange,
   isLoading,
 }) => {
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+
+  // GSAP card entrance animation when plan or category changes
+  useEffect(() => {
+    if (cardsContainerRef.current) {
+      gsap.fromTo(
+        cardsContainerRef.current.querySelectorAll('.action-plan-card'),
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.35, stagger: 0.06, ease: 'power2.out' }
+      );
+    }
+  }, [plan, activeCategory]);
+
   if (isLoading) {
     return (
       <section
@@ -37,7 +51,7 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
         aria-live="polite"
         className="space-y-4"
       >
-        <div className="p-4 rounded-xl bg-surface border border-subtle flex items-center gap-3 text-slate-300 text-xs">
+        <div className="p-4 rounded-xl bg-[#0C121B] border-2 border-slate-700 brutal-shadow flex items-center gap-3 text-slate-200 text-xs font-mono">
           <RefreshCw className="w-4 h-4 text-emerald-400 animate-spin" aria-hidden="true" />
           <span>Analyzing winter atmospheric inversion and tailoring your family action plan...</span>
         </div>
@@ -45,7 +59,7 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="p-5 rounded-2xl bg-surface border border-subtle/80 space-y-3 animate-pulse"
+              className="p-5 rounded-xl bg-[#0C121B] border-2 border-slate-800 space-y-3 animate-pulse brutal-shadow-sm"
             >
               <div className="h-4 bg-slate-800 rounded w-1/3" />
               <div className="h-5 bg-slate-800 rounded w-3/4" />
@@ -60,7 +74,7 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
 
   if (!plan || plan.recommendations.length === 0) {
     return (
-      <div className="p-8 text-center bg-surface border border-subtle rounded-2xl text-slate-400 text-xs">
+      <div className="p-8 text-center bg-[#0C121B] border-2 border-slate-700 rounded-xl text-slate-400 text-xs font-mono brutal-shadow">
         No active recommendations. Click "Generate Personalized Plan" to analyze your household profile.
       </div>
     );
@@ -77,20 +91,20 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
         return {
           label: 'Daily Routine',
           icon: <Clock className="w-3.5 h-3.5" aria-hidden="true" />,
-          badgeColor: 'bg-indigo-950/40 border-indigo-500/40 text-indigo-300',
+          badgeColor: 'bg-indigo-950/80 border-2 border-indigo-500 text-indigo-200',
         };
       case 'indoor_hack':
         return {
           label: 'Indoor Air Hack',
           icon: <Home className="w-3.5 h-3.5" aria-hidden="true" />,
-          badgeColor: 'bg-cyan-950/40 border-cyan-500/40 text-cyan-300',
+          badgeColor: 'bg-cyan-950/80 border-2 border-cyan-500 text-cyan-200',
         };
       case 'sustainable_alternative':
       default:
         return {
           label: 'Sustainable Swap',
           icon: <Zap className="w-3.5 h-3.5" aria-hidden="true" />,
-          badgeColor: 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300',
+          badgeColor: 'bg-emerald-950/80 border-2 border-emerald-500 text-emerald-200',
         };
     }
   };
@@ -105,27 +119,27 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
   return (
     <section aria-labelledby="plan-section-title" className="space-y-4">
       {/* Plan Header & Winter Smog Advisory Alert */}
-      <div className="bg-surface border border-subtle rounded-2xl p-5 shadow-lg space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-subtle">
+      <div className="bg-[#0C121B] border-2 border-slate-700 rounded-xl p-5 brutal-shadow space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b-2 border-slate-800">
           <div>
             <div className="flex items-center gap-2">
-              <h2 id="plan-section-title" className="text-base font-bold text-slate-100 font-sans">
+              <h2 id="plan-section-title" className="text-base font-extrabold uppercase tracking-wide text-white font-sans">
                 Tailored Winter Smog Action Plan
               </h2>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-                {plan.generatedBy === 'gemini-ai' ? 'Gemini 2.5 Flash' : 'Deterministic Engine'}
+              <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-slate-900 text-emerald-300 border border-emerald-500/50">
+                [{plan.generatedBy === 'gemini-ai' ? 'GEMINI_2.5_FLASH' : 'DETERMINISTIC_ENGINE'}]
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">{plan.summary}</p>
+            <p className="text-xs text-slate-400 mt-1">{plan.summary}</p>
           </div>
         </div>
 
         {/* Smog Advisory Callout */}
-        <div className="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-200 flex items-start gap-2.5">
+        <div className="p-3.5 rounded-lg bg-amber-950/30 border-2 border-amber-500/50 text-xs text-amber-200 flex items-start gap-2.5 brutal-shadow-sm">
           <Info className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="space-y-0.5">
-            <span className="font-semibold text-amber-300">Winter Boundary Layer Trap Advisory:</span>
-            <p className="text-amber-200/90 leading-relaxed">{plan.winterSmogAdvisory}</p>
+            <span className="font-bold uppercase tracking-wider text-amber-300 font-mono">Winter Boundary Layer Trap Advisory:</span>
+            <p className="text-amber-200/90 leading-relaxed font-sans">{plan.winterSmogAdvisory}</p>
           </div>
         </div>
 
@@ -133,7 +147,7 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
         <div
           role="tablist"
           aria-label="Filter recommendations by category"
-          className="flex flex-wrap items-center gap-1.5 pt-1"
+          className="flex flex-wrap items-center gap-2 pt-1"
         >
           {[
             { id: 'all', label: `All Actions (${counts.all})` },
@@ -150,10 +164,10 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
                 aria-selected={isActive}
                 aria-controls={`tabpanel-${tab.id}`}
                 onClick={() => onCategoryChange(tab.id as 'all' | RecommendationCategory)}
-                className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                className={`px-3 py-1.5 text-xs font-bold font-mono uppercase rounded-lg border-2 transition-all brutal-btn ${
                   isActive
-                    ? 'bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-semibold shadow-sm'
-                    : 'bg-elevated/70 border border-subtle text-slate-400 hover:text-slate-200 hover:border-slate-600'
+                    ? 'bg-emerald-500/25 border-emerald-400 text-emerald-200 brutal-shadow-emerald'
+                    : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 brutal-shadow-sm'
                 }`}
               >
                 {tab.label}
@@ -165,6 +179,7 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
 
       {/* Recommendations Cards Grid */}
       <div
+        ref={cardsContainerRef}
         id={`tabpanel-${activeCategory}`}
         role="tabpanel"
         aria-labelledby={`tab-${activeCategory}`}
@@ -177,17 +192,17 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
           return (
             <article
               key={rec.id}
-              className={`p-5 rounded-2xl border transition-all duration-200 flex flex-col justify-between space-y-4 shadow-sm ${
+              className={`action-plan-card p-5 rounded-xl border-2 transition-all flex flex-col justify-between space-y-4 ${
                 isAdopted
-                  ? 'bg-surface border-emerald-500/50 ring-1 ring-emerald-500/30'
-                  : 'bg-surface border-subtle hover:border-slate-600'
+                  ? 'bg-[#101726] border-emerald-500 brutal-shadow-emerald'
+                  : 'bg-[#0C121B] border-slate-700 hover:border-slate-500 brutal-shadow'
               }`}
             >
               <div className="space-y-2.5">
                 {/* Category & Adoption Checkbox Header */}
                 <div className="flex items-center justify-between gap-2">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${meta.badgeColor}`}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-bold font-mono uppercase ${meta.badgeColor}`}
                   >
                     {meta.icon}
                     {meta.label}
@@ -198,10 +213,10 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
                     role="checkbox"
                     aria-checked={isAdopted}
                     onClick={() => onToggleAdopt(rec.id)}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg font-semibold transition-all focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold font-mono uppercase rounded-lg border-2 transition-all brutal-btn ${
                       isAdopted
-                        ? 'bg-emerald-400 text-slate-950 hover:bg-emerald-300'
-                        : 'bg-elevated border border-subtle text-slate-300 hover:border-emerald-500/50 hover:text-emerald-400'
+                        ? 'bg-emerald-400 text-slate-950 border-emerald-500 hover:bg-emerald-300'
+                        : 'bg-slate-900 border-slate-600 text-slate-300 hover:border-emerald-400 hover:text-emerald-400'
                     }`}
                   >
                     <Check className={`w-3.5 h-3.5 ${isAdopted ? 'stroke-[3]' : 'opacity-40'}`} aria-hidden="true" />
@@ -211,38 +226,38 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
 
                 {/* Title & Metadata */}
                 <div>
-                  <h3 className="text-sm font-bold text-slate-100 font-sans leading-snug">
+                  <h3 className="text-sm font-extrabold text-white font-sans leading-snug">
                     {rec.title}
                   </h3>
-                  <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-slate-400 font-mono">
+                  <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-slate-400 font-mono font-semibold">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3 h-3 text-slate-500" aria-hidden="true" />
                       {rec.timeframe}
                     </span>
                     <span>•</span>
-                    <span>
+                    <span className="text-cyan-300">
                       {rec.estimatedCostInr === 0 ? 'Zero-Cost / Free' : `Cost: ~₹${rec.estimatedCostInr}`}
                     </span>
                   </div>
                 </div>
 
                 {/* Description */}
-                <p className="text-xs text-slate-300 leading-relaxed">{rec.description}</p>
+                <p className="text-xs text-slate-300 leading-relaxed font-sans">{rec.description}</p>
               </div>
 
               {/* Direct Impact Explanation Box (Mandated by Problem Statement) */}
-              <div className="p-3.5 rounded-xl bg-elevated/90 border border-subtle/90 space-y-2 text-xs">
-                <div className="flex items-center justify-between font-mono font-semibold">
+              <div className="p-3.5 rounded-lg bg-[#111824] border-2 border-slate-700/80 space-y-2 text-xs brutal-shadow-sm">
+                <div className="flex items-center justify-between font-mono font-black">
                   <span className="text-emerald-400">
-                    -{rec.impact.pm25ReductionPercent}% PM<sub>2.5</sub> Inhaled
+                    -{rec.impact.pm25ReductionPercent}% PM<sub>2.5</sub> INHALED
                   </span>
                   <span className="text-cyan-400">
                     +{rec.impact.weeklyCo2SavedKg} kg CO₂/wk
                   </span>
                 </div>
 
-                <div className="pt-1.5 border-t border-subtle/60 text-slate-300 leading-relaxed text-[11px]">
-                  <strong className="text-slate-100 font-sans block mb-0.5">
+                <div className="pt-2 border-t-2 border-slate-800 text-slate-300 leading-relaxed text-[11px] font-sans">
+                  <strong className="text-white uppercase font-mono font-bold block mb-0.5 text-[10px] tracking-wider text-emerald-300">
                     Direct Impact Explanation:
                   </strong>
                   {rec.impact.directExplanation}
