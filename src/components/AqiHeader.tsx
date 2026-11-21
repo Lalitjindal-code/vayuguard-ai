@@ -139,7 +139,7 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-extrabold tracking-tight text-white font-sans uppercase">
+                  <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white font-display uppercase">
                     {language === 'hi' ? 'वायुगार्ड' : 'VayuGuard'}
                     <span className="text-emerald-400 ml-1">AI</span>
                   </h1>

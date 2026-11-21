@@ -40,7 +40,7 @@ export const CommuteCompareModal: React.FC<CommuteCompareModalProps> = ({
             <Car className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />
           </div>
           <div>
-            <h2 id="commute-modal-title" className="text-base font-extrabold uppercase tracking-wide text-white font-sans">
+            <h2 id="commute-modal-title" className="text-base font-black uppercase tracking-wide text-white font-display">
               Head-to-Head Commute Exposure & Emission Evaluator
             </h2>
             <p className="text-xs text-slate-400 font-mono">

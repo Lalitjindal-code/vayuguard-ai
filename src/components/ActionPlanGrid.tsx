@@ -123,7 +123,7 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b-2 border-slate-800">
           <div>
             <div className="flex items-center gap-2">
-              <h2 id="plan-section-title" className="text-base font-extrabold uppercase tracking-wide text-white font-sans">
+              <h2 id="plan-section-title" className="text-base font-black uppercase tracking-wide text-white font-display">
                 Tailored Winter Smog Action Plan
               </h2>
               <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-slate-900 text-emerald-300 border border-emerald-500/50">

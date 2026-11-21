@@ -26,7 +26,7 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
             <Clock className="w-4 h-4 stroke-[2.5]" aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-sm font-extrabold uppercase tracking-wide text-white font-sans">
+            <h2 className="text-sm font-black uppercase tracking-wide text-white font-display">
               24-Hour Diurnal Inversion & Smog Trap Cycle
             </h2>
             <p className="text-xs text-slate-400 font-mono">

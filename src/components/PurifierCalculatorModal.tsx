@@ -56,7 +56,7 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
             <Wrench className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />
           </div>
           <div>
-            <h2 id="purifier-modal-title" className="text-base font-extrabold uppercase tracking-wide text-white font-sans">
+            <h2 id="purifier-modal-title" className="text-base font-black uppercase tracking-wide text-white font-display">
               DIY Box-Fan & HEPA Purifier CADR Calculator
             </h2>
             <p className="text-xs text-slate-400 font-mono">

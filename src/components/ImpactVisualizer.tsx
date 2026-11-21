@@ -65,7 +65,7 @@ export const ImpactVisualizer: React.FC<ImpactVisualizerProps> = ({ impact }) =>
             <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-base font-extrabold uppercase tracking-wide text-white font-sans">
+            <h2 className="text-base font-black uppercase tracking-wide text-white font-display">
               Quantified Direct Impact
             </h2>
             <p className="text-xs text-slate-400 font-mono">

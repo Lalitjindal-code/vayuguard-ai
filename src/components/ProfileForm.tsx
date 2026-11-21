@@ -59,7 +59,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           <Users className="w-4 h-4 stroke-[2.5]" aria-hidden="true" />
         </div>
         <div>
-          <h2 id="profile-heading" className="text-base font-extrabold uppercase tracking-wide text-white font-sans">
+          <h2 id="profile-heading" className="text-base font-black uppercase tracking-wide text-white font-display">
             Household Context Profiler
           </h2>
           <p className="text-xs text-slate-400 font-mono">Tailors routines & hacks to your lifestyle</p>
@@ -181,7 +181,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3 px-4 rounded-xl font-extrabold uppercase font-mono text-xs text-slate-950 bg-emerald-400 hover:bg-emerald-300 border-2 border-emerald-500 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all brutal-shadow-emerald brutal-btn flex items-center justify-center gap-2"
+          className="w-full py-3 px-4 rounded-xl font-black uppercase font-display tracking-wider text-xs text-slate-950 bg-emerald-400 hover:bg-emerald-300 border-2 border-emerald-500 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all brutal-shadow-emerald brutal-btn flex items-center justify-center gap-2"
         >
           {isLoading ? (
             <>

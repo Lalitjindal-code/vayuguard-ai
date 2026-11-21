@@ -4,49 +4,88 @@
 
 @layer base {
   body {
-    background-color: #06090E;
-    color: #F1F5F9;
+    background-color: #060A0F;
+    color: #F8FAFC;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   }
 }
 
+/* Display Typography Utility */
+.font-display {
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
 /* Neo-Brutalist Technical Grid Background */
 .bg-grid-pattern {
-  background-size: 28px 28px;
+  background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
 
 .bg-dot-matrix {
-  background-image: radial-gradient(rgba(16, 185, 129, 0.15) 1.5px, transparent 1.5px);
-  background-size: 20px 20px;
+  background-image: radial-gradient(rgba(16, 185, 129, 0.18) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
 }
 
-/* Severe Hazard Caution Diagonal Stripes */
+/* Hazard Tape & Caution Accents */
+.hazard-tape {
+  background: repeating-linear-gradient(
+    -45deg,
+    #EF4444,
+    #EF4444 10px,
+    #991B1B 10px,
+    #991B1B 20px
+  );
+}
+
+.caution-tape {
+  background: repeating-linear-gradient(
+    -45deg,
+    #F59E0B,
+    #F59E0B 10px,
+    #78350F 10px,
+    #78350F 20px
+  );
+}
+
+.safe-tape {
+  background: repeating-linear-gradient(
+    -45deg,
+    #10B981,
+    #10B981 10px,
+    #065F46 10px,
+    #065F46 20px
+  );
+}
+
 .bg-hazard-stripes {
   background: repeating-linear-gradient(
     -45deg,
-    rgba(239, 68, 68, 0.18),
-    rgba(239, 68, 68, 0.18) 12px,
-    rgba(153, 27, 27, 0.28) 12px,
-    rgba(153, 27, 27, 0.28) 24px
+    rgba(239, 68, 68, 0.22),
+    rgba(239, 68, 68, 0.22) 12px,
+    rgba(153, 27, 27, 0.32) 12px,
+    rgba(153, 27, 27, 0.32) 24px
   );
 }
 
 .bg-safe-stripes {
   background: repeating-linear-gradient(
     -45deg,
-    rgba(16, 185, 129, 0.12),
-    rgba(16, 185, 129, 0.12) 12px,
-    rgba(5, 150, 105, 0.2) 12px,
-    rgba(5, 150, 105, 0.2) 24px
+    rgba(16, 185, 129, 0.15),
+    rgba(16, 185, 129, 0.15) 12px,
+    rgba(5, 150, 105, 0.25) 12px,
+    rgba(5, 150, 105, 0.25) 24px
   );
 }
 
 /* Custom Neo-Brutalist Hard Shadows */
 .brutal-shadow {
   box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.brutal-shadow-lg {
+  box-shadow: 6px 6px 0px 0px #000000;
 }
 
 .brutal-shadow-sm {
@@ -69,23 +108,37 @@
   box-shadow: 4px 4px 0px 0px #EF4444;
 }
 
-/* Tactile Button Click Mechanics */
-.brutal-btn {
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+.brutal-shadow-purple {
+  box-shadow: 4px 4px 0px 0px #A855F7;
 }
+
+/* Tactile Brutalist Button Click Mechanics */
+.brutal-btn {
+  transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .brutal-btn:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px 0px #000000;
+  box-shadow: 5px 5px 0px 0px #000000;
 }
+
 .brutal-btn:active {
   transform: translate(2px, 2px);
   box-shadow: 1px 1px 0px 0px #000000;
 }
 
-/* Custom Accessibility Focus Rings */
+/* Neo-Brutalist Panel / Card */
+.brutal-card {
+  background-color: #0B111A;
+  border: 2px solid #334155;
+  box-shadow: 4px 4px 0px 0px #000000;
+  border-radius: 0.75rem;
+}
+
+/* Custom Accessibility Focus Rings (WCAG 2.1 AA) */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #06090E, 0 0 0 5px #10B981 !important;
+  box-shadow: 0 0 0 2px #060A0F, 0 0 0 4px #10B981 !important;
 }
 
 /* Technical Sleek Scrollbar */
@@ -95,12 +148,12 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #06090E;
+  background: #060A0F;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #1E293B;
-  border: 1px solid #06090E;
+  border: 1px solid #060A0F;
 }
 
 ::-webkit-scrollbar-thumb:hover {

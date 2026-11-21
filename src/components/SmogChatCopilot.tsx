@@ -99,7 +99,7 @@ export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
             <MessageSquare className="w-4 h-4 stroke-[2.5]" aria-hidden="true" />
           </div>
           <div>
-            <h2 id="copilot-heading" className="text-sm font-extrabold uppercase tracking-wide text-white flex items-center gap-2">
+            <h2 id="copilot-heading" className="text-sm font-black uppercase tracking-wide text-white font-display flex items-center gap-2">
               Context-Aware Smog Copilot
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/60 font-normal">
                 [CPCB::{telemetry.city}]

@@ -56,7 +56,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
             <Key className="w-5 h-5 stroke-[2.5]" />
           </div>
           <div>
-            <h2 id="api-key-modal-title" className="text-base font-extrabold uppercase tracking-wide text-white font-sans">
+            <h2 id="api-key-modal-title" className="text-base font-black uppercase tracking-wide text-white font-display">
               Gemini API Key (BYOK)
             </h2>
             <p className="text-xs text-slate-400 font-mono">Optional session-only configuration</p>

@@ -133,7 +133,7 @@ Please reply with your Block/Flat number and daily route to match with nearby fa
             <MessageSquare className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />
           </div>
           <div>
-            <h2 id="rwa-modal-title" className="text-base font-extrabold uppercase tracking-wide text-white font-sans">
+            <h2 id="rwa-modal-title" className="text-base font-black uppercase tracking-wide text-white font-display">
               Shareable RWA & Community Action Kit
             </h2>
             <p className="text-xs text-slate-400 font-mono">
