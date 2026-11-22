@@ -196,14 +196,18 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
         aria-labelledby={`tab-${activeCategory}`}
         className="grid grid-cols-1 md:grid-cols-2 gap-4"
       >
-        {filteredRecommendations.map((rec) => {
+        {filteredRecommendations.map((rec, index) => {
           const isAdopted = adoptedIds.has(rec.id);
           const meta = getCategoryMeta(rec.category);
+          const isOddCount = filteredRecommendations.length % 2 !== 0;
+          const isFeatured = isOddCount && index === 0;
 
           return (
             <article
               key={rec.id}
               className={`action-plan-card p-5 rounded-xl border-2 transition-all flex flex-col justify-between space-y-4 ${
+                isFeatured ? 'md:col-span-2' : ''
+              } ${
                 isAdopted
                   ? 'bg-[#101726] border-emerald-500 brutal-shadow-emerald'
                   : 'bg-[#0C121B] border-slate-700 hover:border-slate-500 brutal-shadow'
@@ -212,12 +216,19 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
               <div className="space-y-3">
                 {/* Category & Adoption Checkbox Header */}
                 <div className="flex items-center justify-between gap-2">
-                  <span
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-bold font-mono uppercase ${meta.badgeColor}`}
-                  >
-                    {meta.icon}
-                    {meta.label}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-bold font-mono uppercase ${meta.badgeColor}`}
+                    >
+                      {meta.icon}
+                      {meta.label}
+                    </span>
+                    {isFeatured && (
+                      <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-400 text-emerald-300 font-mono text-[10px] font-black uppercase">
+                        ⭐ Highest Priority
+                      </span>
+                    )}
+                  </div>
 
                   <button
                     type="button"

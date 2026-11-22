@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Clock, Sun, AlertTriangle, ShieldCheck, Activity } from 'lucide-react';
 import { HourlyForecastPoint } from '../types/airQuality';
 
@@ -10,6 +10,8 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
   hourlyForecast = [],
 }) => {
   const [selectedHourIdx, setSelectedHourIdx] = useState<number>(13); // Default 1 PM safe window
+  const [isHoveringGraph, setIsHoveringGraph] = useState<boolean>(false);
+  const graphContainerRef = useRef<HTMLDivElement>(null);
 
   if (hourlyForecast.length === 0) return null;
 
@@ -24,20 +26,49 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
 
   const currentHeight = boundaryHeights[selectedHourIdx] || 500;
 
-  // Generate SVG path points for the boundary curve (viewBox 0 0 720 90)
-  // Height ranges from 120m (y=75) to 1300m (y=10)
+  // Generate SVG path coordinates (viewBox 0 0 720 100)
+  // Height ranges from 120m (y=88) to 1300m (y=12)
   const svgPoints = boundaryHeights.map((h, i) => {
     const x = (i / 23) * 720;
-    // Map 120m-1300m to y=75-10
-    const y = 80 - ((h - 120) / (1300 - 120)) * 65;
+    const y = 90 - ((h - 120) / (1300 - 120)) * 75;
     return { x, y, h };
   });
 
-  const pathD = `M 0,85 L 0,${svgPoints[0].y} ` +
-    svgPoints.map((p) => `L ${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ') +
-    ` L 720,85 Z`;
+  // Smooth Catmull-Rom / Cubic Bezier Spline Generator
+  const getSmoothSpline = (pts: { x: number; y: number }[]): string => {
+    if (pts.length === 0) return '';
+    let d = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i === 0 ? 0 : i - 1];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[i + 2 >= pts.length ? pts.length - 1 : i + 2];
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+    }
+    return d;
+  };
+
+  const smoothCurve = getSmoothSpline(svgPoints);
+  const areaPath = `${smoothCurve} L 720,95 L 0,95 Z`;
 
   const selectedPoint = svgPoints[selectedHourIdx] || svgPoints[0];
+
+  // Interactive scrubber on graph drag / hover
+  const handlePointerScrub = (clientX: number) => {
+    if (!graphContainerRef.current) return;
+    const rect = graphContainerRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+    const idx = Math.round((x / rect.width) * 23);
+    if (idx >= 0 && idx < 24) {
+      setSelectedHourIdx(idx);
+    }
+  };
 
   return (
     <section
@@ -61,7 +92,7 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
 
         {/* Selected Hour Pill */}
         <div
-          className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg border-2 text-xs font-bold font-mono ${
+          className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg border-2 text-xs font-bold font-mono transition-all ${
             currentPoint.isSafeWindow
               ? 'bg-emerald-950 border-emerald-500 text-emerald-300 brutal-shadow-emerald'
               : currentPoint.inversionRisk === 'High'
@@ -70,9 +101,9 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
           }`}
         >
           {currentPoint.isSafeWindow ? (
-            <Sun className="w-4 h-4 text-emerald-400" />
+            <Sun className="w-4 h-4 text-emerald-400 animate-spin-slow" />
           ) : (
-            <AlertTriangle className="w-4 h-4 text-red-400" />
+            <AlertTriangle className="w-4 h-4 text-red-400 animate-pulse" />
           )}
           <span>{currentPoint.time}:</span>
           <span className="font-mono font-black">AQI {currentPoint.aqi}</span>
@@ -80,68 +111,117 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
         </div>
       </div>
 
-      {/* Visual Atmospheric Boundary Layer Altitude Wave */}
-      <div className="p-3 rounded-lg bg-[#070D14] border border-slate-800 space-y-2">
+      {/* Visual Atmospheric Boundary Layer Altitude Wave with Interactive Scrubbing */}
+      <div className="p-3.5 rounded-lg bg-[#070D14] border border-slate-800 space-y-2">
         <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
-          <span className="flex items-center gap-1.5 text-cyan-400 font-bold">
-            <Activity className="w-3.5 h-3.5" />
-            Atmospheric Boundary Mixing Layer Height (m)
+          <span className="flex items-center gap-1.5 text-cyan-300 font-bold">
+            <Activity className="w-3.5 h-3.5 text-cyan-400" />
+            Atmospheric Boundary Mixing Layer Height (Scrub curve to simulate)
           </span>
-          <span className="text-slate-500">
-            Selected: <strong className="text-white">{currentHeight} meters</strong> above ground
+          <span className="text-slate-400">
+            Selected: <strong className="text-cyan-300 font-mono text-xs">{currentHeight} meters</strong> above ground
           </span>
         </div>
 
-        {/* SVG Wave Visualization */}
-        <div className="relative w-full h-20 bg-slate-950/60 rounded overflow-hidden border border-slate-800">
+        {/* SVG Interactive Canvas Container */}
+        <div
+          ref={graphContainerRef}
+          onPointerDown={(e) => {
+            setIsHoveringGraph(true);
+            handlePointerScrub(e.clientX);
+          }}
+          onPointerMove={(e) => {
+            if (e.buttons === 1 || isHoveringGraph) {
+              handlePointerScrub(e.clientX);
+            }
+          }}
+          onPointerEnter={() => setIsHoveringGraph(true)}
+          onPointerLeave={() => setIsHoveringGraph(false)}
+          className="relative w-full h-24 bg-slate-950/80 rounded-lg overflow-hidden border border-slate-800 cursor-ew-resize select-none touch-none"
+        >
           <svg
             className="w-full h-full"
-            viewBox="0 0 720 90"
+            viewBox="0 0 720 100"
             preserveAspectRatio="none"
             aria-hidden="true"
           >
             <defs>
               <linearGradient id="boundaryGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#EF4444" stopOpacity="0.4" />
-                <stop offset="25%" stopColor="#DC2626" stopOpacity="0.5" />
-                <stop offset="45%" stopColor="#10B981" stopOpacity="0.6" />
-                <stop offset="65%" stopColor="#10B981" stopOpacity="0.6" />
-                <stop offset="85%" stopColor="#F59E0B" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="#EF4444" stopOpacity="0.4" />
+                <stop offset="0%" stopColor="#EF4444" stopOpacity="0.45" />
+                <stop offset="28%" stopColor="#DC2626" stopOpacity="0.55" />
+                <stop offset="48%" stopColor="#10B981" stopOpacity="0.65" />
+                <stop offset="68%" stopColor="#10B981" stopOpacity="0.65" />
+                <stop offset="85%" stopColor="#F59E0B" stopOpacity="0.45" />
+                <stop offset="100%" stopColor="#EF4444" stopOpacity="0.45" />
               </linearGradient>
+
+              {/* Neon Glow Filter */}
+              <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#22D3EE" floodOpacity="0.6" />
+              </filter>
             </defs>
 
-            {/* Inversion Safety Threshold Reference Line at 800m (y=35) */}
-            <line x1="0" y1="35" x2="720" y2="35" stroke="#334155" strokeDasharray="3 3" strokeWidth="1" />
-            <text x="8" y="32" fill="#64748B" fontSize="9" fontFamily="JetBrains Mono">Safe Convection Threshold (800m+)</text>
+            {/* Altitude Threshold Reference Guidelines */}
+            {/* 1,200m Convection Peak Line (y=18) */}
+            <line x1="0" y1="18" x2="720" y2="18" stroke="#10B981" strokeDasharray="3 3" strokeWidth="0.8" opacity="0.6" />
+            <text x="8" y="15" fill="#10B981" fontSize="9" fontFamily="JetBrains Mono" opacity="0.8">
+              1,200m • Solar Convection Peak (Optimal Ventilation)
+            </text>
 
-            {/* Filled Boundary Curve */}
-            <path d={pathD} fill="url(#boundaryGradient)" />
-            {/* Outline Curve */}
+            {/* 800m Safe Mixing Threshold Line (y=44) */}
+            <line x1="0" y1="44" x2="720" y2="44" stroke="#06B6D4" strokeDasharray="3 3" strokeWidth="0.8" opacity="0.5" />
+            <text x="8" y="41" fill="#06B6D4" fontSize="9" fontFamily="JetBrains Mono" opacity="0.8">
+              800m • Safe Ventilation Threshold
+            </text>
+
+            {/* 200m Ground Trap Hazard Line (y=84) */}
+            <line x1="0" y1="84" x2="720" y2="84" stroke="#EF4444" strokeDasharray="3 3" strokeWidth="0.8" opacity="0.6" />
+            <text x="8" y="81" fill="#EF4444" fontSize="9" fontFamily="JetBrains Mono" opacity="0.8">
+              200m • Nocturnal Surface Trap Zone (&lt;200m)
+            </text>
+
+            {/* Smooth Filled Boundary Area */}
+            <path d={areaPath} fill="url(#boundaryGradient)" />
+
+            {/* Silky-Smooth Neon Boundary Line */}
             <path
-              d={svgPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}
+              d={smoothCurve}
               fill="none"
               stroke="#22D3EE"
-              strokeWidth="2"
+              strokeWidth="2.5"
+              filter="url(#neonGlow)"
             />
 
-            {/* Selected Hour Vertical Line & Scrubber Dot */}
+            {/* Selected Hour Vertical Scrubber Beam */}
             <line
               x1={selectedPoint.x}
               y1="0"
               x2={selectedPoint.x}
-              y2="90"
+              y2="100"
               stroke="#F8FAFC"
               strokeWidth="1.5"
               strokeDasharray="2 2"
+              className="transition-all duration-75"
             />
+
+            {/* Selected Point Glowing Radar Pulse */}
             <circle
               cx={selectedPoint.x}
               cy={selectedPoint.y}
-              r="4.5"
+              r="8"
+              fill={currentPoint.isSafeWindow ? '#10B981' : '#EF4444'}
+              opacity="0.3"
+              className="animate-ping"
+            />
+            {/* Solid Scrubber Dot */}
+            <circle
+              cx={selectedPoint.x}
+              cy={selectedPoint.y}
+              r="5"
               fill={currentPoint.isSafeWindow ? '#10B981' : '#EF4444'}
               stroke="#FFFFFF"
               strokeWidth="2"
+              className="transition-all duration-75"
             />
           </svg>
         </div>
