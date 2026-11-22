@@ -14,6 +14,33 @@ html {
   }
 }
 
+/* Custom Neo-Brutalist Select & Option Tray Styling (Dark Mode Popover) */
+select {
+  color-scheme: dark !important;
+  background-color: #0F1724 !important;
+  color: #F8FAFC !important;
+}
+
+select option {
+  background-color: #0A0F18 !important;
+  color: #F8FAFC !important;
+  padding: 12px 14px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+select option:checked {
+  background-color: #10B981 !important;
+  color: #060A0F !important;
+  font-weight: 800 !important;
+}
+
+select option:hover {
+  background-color: #162338 !important;
+  color: #38BDF8 !important;
+}
+
 /* Display Typography Utility */
 .font-display {
   font-family: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;

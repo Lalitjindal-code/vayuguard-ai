@@ -8,6 +8,7 @@ import {
   FileText,
   Sparkles,
   RefreshCw,
+  ChevronDown,
 } from 'lucide-react';
 import {
   HouseholdProfile,
@@ -73,16 +74,21 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             <Home className="w-3.5 h-3.5 text-cyan-400" aria-hidden="true" />
             Housing Type & Location
           </label>
-          <select
-            id="housing-select"
-            value={profile.housing}
-            onChange={(e) => onChange({ ...profile, housing: e.target.value as HousingType })}
-            className="w-full px-3 py-2 text-xs font-bold font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-white hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
-          >
-            <option value="apartment">High-Rise Apartment (Ventilation elevation)</option>
-            <option value="independent_house">Ground Floor / Independent Villa</option>
-            <option value="roadside_home">Roadside / High-Traffic Corridor</option>
-          </select>
+          <div className="relative">
+            <select
+              id="housing-select"
+              value={profile.housing}
+              onChange={(e) => onChange({ ...profile, housing: e.target.value as HousingType })}
+              className="w-full pl-3 pr-8 py-2 text-xs font-bold font-mono bg-[#0A0F18] border-2 border-slate-700 rounded-lg text-white hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
+            >
+              <option value="apartment">High-Rise Apartment (Ventilation elevation)</option>
+              <option value="independent_house">Ground Floor / Independent Villa</option>
+              <option value="roadside_home">Roadside / High-Traffic Corridor</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-emerald-400">
+              <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+            </div>
+          </div>
         </div>
 
         {/* Vulnerable Groups */}
@@ -125,17 +131,22 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             <Car className="w-3.5 h-3.5 text-cyan-400" aria-hidden="true" />
             Primary Daily Commute Mode
           </label>
-          <select
-            id="commute-select"
-            value={profile.commute}
-            onChange={(e) => onChange({ ...profile, commute: e.target.value as CommuteMode })}
-            className="w-full px-3 py-2 text-xs font-bold font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-white hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
-          >
-            <option value="solo_car">Solo Car (Petrol / Diesel / CNG)</option>
-            <option value="two_wheeler">Motorcycle / Scooter (High roadside exposure)</option>
-            <option value="public_transit">Metro / City Bus Transit</option>
-            <option value="ev_or_wfh">Electric Vehicle / Bicycle / WFH</option>
-          </select>
+          <div className="relative">
+            <select
+              id="commute-select"
+              value={profile.commute}
+              onChange={(e) => onChange({ ...profile, commute: e.target.value as CommuteMode })}
+              className="w-full pl-3 pr-8 py-2 text-xs font-bold font-mono bg-[#0A0F18] border-2 border-slate-700 rounded-lg text-white hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
+            >
+              <option value="solo_car">Solo Car (Petrol / Diesel / CNG)</option>
+              <option value="two_wheeler">Motorcycle / Scooter (High roadside exposure)</option>
+              <option value="public_transit">Metro / City Bus Transit</option>
+              <option value="ev_or_wfh">Electric Vehicle / Bicycle / WFH</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-emerald-400">
+              <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+            </div>
+          </div>
         </div>
 
         {/* Cooking & Heating Fuel */}
@@ -144,17 +155,22 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             <Flame className="w-3.5 h-3.5 text-orange-400" aria-hidden="true" />
             Indoor Cooking & Winter Heating
           </label>
-          <select
-            id="fuel-select"
-            value={profile.cookingFuel}
-            onChange={(e) => onChange({ ...profile, cookingFuel: e.target.value as CookingFuel })}
-            className="w-full px-3 py-2 text-xs font-bold font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-white hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
-          >
-            <option value="lpg_with_chimney">LPG / PNG Gas with Active Chimney</option>
-            <option value="lpg_no_exhaust">LPG Gas without Duct Exhaust</option>
-            <option value="electric_induction">Induction / Microwave / Clean Electric</option>
-            <option value="biomass_coal">Space Coil Heater / Biomass / Wood Fire</option>
-          </select>
+          <div className="relative">
+            <select
+              id="fuel-select"
+              value={profile.cookingFuel}
+              onChange={(e) => onChange({ ...profile, cookingFuel: e.target.value as CookingFuel })}
+              className="w-full pl-3 pr-8 py-2 text-xs font-bold font-mono bg-[#0A0F18] border-2 border-slate-700 rounded-lg text-white hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
+            >
+              <option value="lpg_with_chimney">LPG / PNG Gas with Active Chimney</option>
+              <option value="lpg_no_exhaust">LPG Gas without Duct Exhaust</option>
+              <option value="electric_induction">Induction / Microwave / Clean Electric</option>
+              <option value="biomass_coal">Space Coil Heater / Biomass / Wood Fire</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-emerald-400">
+              <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+            </div>
+          </div>
         </div>
 
         {/* Specific Notes (Sanitized) */}

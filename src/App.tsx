@@ -170,8 +170,8 @@ export const App: React.FC = () => {
 
         {/* Responsive 12-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Rail: Household Context & Smog Copilot (4 cols) */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* Left Rail: Household Context & Smog Copilot (4 cols, sticky on desktop to prevent empty side space) */}
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto pr-1">
             <ProfileForm
               profile={profile}
               onChange={setProfile}
