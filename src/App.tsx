@@ -170,13 +170,20 @@ export const App: React.FC = () => {
 
         {/* Responsive 12-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Rail: Household Context & Profile Form (4 cols, sticky on desktop to prevent empty side space) */}
-          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20">
+          {/* Left Rail: Household Context & Smog Copilot (4 cols) */}
+          <div className="lg:col-span-4 space-y-6">
             <ProfileForm
               profile={profile}
               onChange={setProfile}
               onSubmit={handleGeneratePlan}
               isLoading={isLoadingPlan}
+            />
+
+            {/* Smog Copilot Interactive Assistant - fills left column space seamlessly */}
+            <SmogChatCopilot
+              profile={profile}
+              telemetry={telemetry}
+              userApiKey={customApiKey}
             />
           </div>
 
@@ -193,15 +200,6 @@ export const App: React.FC = () => {
               isLoading={isLoadingPlan}
             />
           </div>
-        </div>
-
-        {/* Smog Copilot Interactive Conversational Assistant */}
-        <div className="pt-2">
-          <SmogChatCopilot
-            profile={profile}
-            telemetry={telemetry}
-            userApiKey={customApiKey}
-          />
         </div>
       </main>
 

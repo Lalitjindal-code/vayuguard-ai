@@ -50,40 +50,17 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
   hasCustomKey,
 }) => {
   const [customSearch, setCustomSearch] = useState<string>('');
-  const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const t = TRANSLATIONS[language];
   const headerRef = useRef<HTMLElement>(null);
   const aqiBadgeRef = useRef<HTMLDivElement>(null);
-
-  // Dynamic header collapse on scroll with hysteresis and requestAnimationFrame to avoid jitter
-  useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const y = window.scrollY;
-          // Collapse at scroll > 150px, only expand back when scrolled to top < 40px
-          setIsScrolled((prev) => {
-            if (!prev && y > 150) return true;
-            if (prev && y < 40) return false;
-            return prev;
-          });
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // GSAP micro-animation on mount and telemetry update
   useEffect(() => {
     if (headerRef.current) {
       gsap.fromTo(
         headerRef.current,
-        { opacity: 0, y: -10 },
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+        { opacity: 0, y: -8 },
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }
       );
     }
   }, []);
@@ -92,8 +69,8 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
     if (aqiBadgeRef.current) {
       gsap.fromTo(
         aqiBadgeRef.current,
-        { scale: 0.92 },
-        { scale: 1, duration: 0.4, ease: 'back.out(2)' }
+        { scale: 0.94 },
+        { scale: 1, duration: 0.35, ease: 'back.out(2)' }
       );
     }
   }, [telemetry.aqi]);
@@ -110,7 +87,7 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
     switch (severity) {
       case 'Severe':
         return {
-          icon: <Flame className="w-5 h-5 text-red-400 animate-pulse" aria-hidden="true" />,
+          icon: <Flame className="w-4 h-4 text-red-400 animate-pulse" aria-hidden="true" />,
           label: t.severeSmog,
           bgColor: 'bg-red-950/80 border-2 border-red-500 text-red-100 brutal-shadow-red',
           textColor: 'text-red-400',
@@ -118,7 +95,7 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
         };
       case 'Poor':
         return {
-          icon: <AlertTriangle className="w-5 h-5 text-orange-400" aria-hidden="true" />,
+          icon: <AlertTriangle className="w-4 h-4 text-orange-400" aria-hidden="true" />,
           label: t.poorAir,
           bgColor: 'bg-orange-950/80 border-2 border-orange-500 text-orange-100 brutal-shadow-amber',
           textColor: 'text-orange-400',
@@ -126,7 +103,7 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
         };
       case 'Moderate':
         return {
-          icon: <Wind className="w-5 h-5 text-amber-400" aria-hidden="true" />,
+          icon: <Wind className="w-4 h-4 text-amber-400" aria-hidden="true" />,
           label: t.moderateAir,
           bgColor: 'bg-amber-950/80 border-2 border-amber-500 text-amber-100 brutal-shadow',
           textColor: 'text-amber-400',
@@ -135,7 +112,7 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
       case 'Good':
       default:
         return {
-          icon: <ShieldCheck className="w-5 h-5 text-emerald-400" aria-hidden="true" />,
+          icon: <ShieldCheck className="w-4 h-4 text-emerald-400" aria-hidden="true" />,
           label: t.goodAir,
           bgColor: 'bg-emerald-950/80 border-2 border-emerald-500 text-emerald-100 brutal-shadow-emerald',
           textColor: 'text-emerald-400',
@@ -149,17 +126,15 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
   return (
     <header
       ref={headerRef}
-      className={`border-b-2 border-slate-700 bg-[#080D14]/95 backdrop-blur sticky top-0 z-40 brutal-shadow transition-all duration-300 ${
-        isScrolled ? 'py-2' : 'py-3'
-      }`}
+      className="border-b-2 border-slate-700 bg-[#080D14]/98 backdrop-blur sticky top-0 z-40 brutal-shadow py-2.5 space-y-2.5 transition-none"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ROW 1: Permanent Brand & Quick Tools Bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-2.5">
+        {/* ROW 1: Brand Identity, Live Severity Badge, Quick Tools & Language */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          {/* Brand & Mission / Compact Inlined AQI */}
+          {/* Brand & Mission */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 brutal-shadow-sm font-mono font-bold flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 brutal-shadow-sm font-mono font-bold flex-shrink-0">
                 <Wind className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />
               </div>
               <div>
@@ -172,30 +147,25 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
                     [CPCB NAQI//INDIA]
                   </span>
                 </div>
-
-                {/* Subtitle when expanded */}
-                {!isScrolled && (
-                  <p className="text-xs text-slate-400 font-mono flex items-center gap-1.5 transition-opacity duration-200">
-                    <Activity className="w-3 h-3 text-emerald-400" />
-                    {t.tagline}
-                  </p>
-                )}
+                <p className="text-[11px] text-slate-400 font-mono flex items-center gap-1.5 hidden sm:flex">
+                  <Activity className="w-3 h-3 text-emerald-400" />
+                  {t.tagline}
+                </p>
               </div>
 
-              {/* Inlined Compact Telemetry Badge when collapsed */}
+              {/* Inlined Live AQI Badge in Top Bar */}
               <div
-                className={`transition-all duration-300 ${
-                  isScrolled ? 'opacity-100 flex items-center gap-2 ml-2' : 'opacity-0 pointer-events-none hidden'
-                }`}
+                ref={aqiBadgeRef}
+                className={`ml-2 flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${badge.bgColor} ${badge.stripes}`}
+                role="status"
+                aria-label={`Air Quality: ${badge.label}, CPCB NAQI ${telemetry.aqi}`}
               >
-                <div className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded border text-xs ${badge.bgColor}`}>
-                  {badge.icon}
-                  <span className="font-extrabold uppercase font-sans text-[11px] hidden sm:inline">{badge.label}</span>
-                  <span className="font-mono text-[11px] font-black">CPCB {telemetry.aqi}</span>
-                </div>
-                <span className="hidden lg:inline-flex items-center gap-1 text-[11px] font-mono text-cyan-300 bg-cyan-950/60 border border-cyan-500/40 px-2 py-0.5 rounded">
-                  <Sun className="w-3 h-3 text-cyan-400" />
-                  {telemetry.safeVentilationWindow}
+                {badge.icon}
+                <span className="font-extrabold uppercase font-sans text-xs">
+                  {badge.label}
+                </span>
+                <span className="font-mono text-xs font-black px-1.5 py-0.5 rounded bg-black/60 border border-white/20">
+                  CPCB {telemetry.aqi}
                 </span>
               </div>
             </div>
@@ -205,7 +175,7 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
               <button
                 type="button"
                 onClick={() => onToggleLanguage(language === 'en' ? 'hi' : 'en')}
-                className="px-2.5 py-1 text-xs font-bold font-mono uppercase bg-slate-800 border-2 border-slate-600 rounded text-emerald-400 brutal-shadow-sm"
+                className="px-2 py-1 text-xs font-bold font-mono uppercase bg-slate-800 border-2 border-slate-600 rounded text-emerald-400 brutal-shadow-sm"
                 aria-label="Toggle language"
               >
                 {language === 'en' ? 'हिंदी' : 'EN'}
@@ -277,18 +247,11 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
           </div>
         </div>
 
-        {/* ROW 2 & 3: Collapsible Search, Preset & Telemetry Deck */}
-        <div
-          className={`transition-all duration-300 ease-in-out overflow-hidden ${
-            isScrolled
-              ? 'max-h-0 opacity-0 pointer-events-none mt-0'
-              : 'max-h-[320px] opacity-100 mt-2.5 pt-2 border-t-2 border-slate-800 space-y-2.5'
-          }`}
-        >
-          {/* Search Bar & City Preset Bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-            {/* Custom City Live Search Form */}
-            <form onSubmit={handleSearchSubmit} className="flex items-center gap-1.5 flex-1 max-w-md">
+        {/* ROW 2: Live City Search, Preset Selector, and Detailed Pollutants & Safe Window */}
+        <div className="pt-2 border-t border-slate-800/80 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5 text-xs">
+          {/* City Search Form & Demo Presets */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1">
+            <form onSubmit={handleSearchSubmit} className="flex items-center gap-1.5 flex-1 max-w-sm">
               <div className="relative flex-1">
                 <label htmlFor="custom-city-search" className="sr-only">
                   {t.searchCityPlaceholder}
@@ -302,20 +265,20 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
                   value={customSearch}
                   onChange={(e) => setCustomSearch(e.target.value)}
                   placeholder={t.searchCityPlaceholder}
-                  className="w-full pl-9 pr-3 py-1.5 text-xs font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400 brutal-shadow-sm"
+                  className="w-full pl-9 pr-3 py-1 text-xs font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400 brutal-shadow-sm"
                 />
               </div>
               <button
                 type="submit"
-                className="px-3.5 py-1.5 text-xs font-extrabold uppercase font-mono bg-emerald-400 text-slate-950 border-2 border-emerald-500 rounded-lg hover:bg-emerald-300 brutal-shadow-sm brutal-btn"
+                className="px-3 py-1 text-xs font-extrabold uppercase font-mono bg-emerald-400 text-slate-950 border-2 border-emerald-500 rounded-lg hover:bg-emerald-300 brutal-shadow-sm brutal-btn"
               >
                 {t.searchBtn}
               </button>
             </form>
 
-            {/* City Selection & Quick Demo Presets */}
-            <div className="flex items-center gap-2 overflow-x-auto py-0.5" role="toolbar" aria-label="Demo AQI presets">
-              <div className="relative min-w-[130px]">
+            {/* City Dropdown & Presets */}
+            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5" role="toolbar" aria-label="Demo AQI presets">
+              <div className="relative min-w-[120px]">
                 <label htmlFor="city-select" className="sr-only">
                   {t.selectCity}
                 </label>
@@ -326,7 +289,7 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
                   id="city-select"
                   value={selectedCity}
                   onChange={(e) => onCityChange(e.target.value)}
-                  className="w-full pl-8 pr-6 py-1.5 text-xs font-bold font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-slate-100 hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
+                  className="w-full pl-8 pr-6 py-1 text-xs font-bold font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-slate-100 hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
                 >
                   <option value="Delhi NCR">Delhi NCR</option>
                   <option value="Bhopal">Bhopal</option>
@@ -346,7 +309,7 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
                   key={preset.name}
                   type="button"
                   onClick={() => onPresetSelect(preset.name)}
-                  className={`px-2.5 py-1 text-xs font-bold font-mono rounded-lg border-2 transition-all brutal-btn whitespace-nowrap ${
+                  className={`px-2 py-1 text-xs font-bold font-mono rounded-lg border-2 transition-all brutal-btn whitespace-nowrap ${
                     selectedCity.toLowerCase().includes(preset.name.toLowerCase())
                       ? 'bg-emerald-500/25 border-emerald-400 text-emerald-200 brutal-shadow-emerald'
                       : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 brutal-shadow-sm'
@@ -359,63 +322,24 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
             </div>
           </div>
 
-          {/* Live Telemetry Bar */}
-          <section
-            aria-label="Current Air Quality Telemetry"
-            className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs"
-          >
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Multi-modal AQI Severity Indicator (CPCB NAQI) */}
-              <div
-                ref={aqiBadgeRef}
-                className={`flex items-center gap-2 px-3.5 py-1 rounded-lg ${badge.bgColor} ${badge.stripes}`}
-                role="status"
-                aria-label={`Air Quality: ${badge.label}, CPCB NAQI ${telemetry.aqi}`}
-              >
-                {badge.icon}
-                <span className="font-extrabold uppercase font-sans tracking-wide text-xs">
-                  {badge.label}
-                </span>
-                <span className="font-mono text-xs font-black px-2 py-0.5 rounded bg-black/60 border border-white/20">
-                  CPCB {telemetry.aqi}
-                </span>
-              </div>
-
-              {/* PM2.5, PM10 & Dominant Pollutant */}
-              <div className="flex items-center gap-3 text-slate-300 font-mono">
-                <span title="Fine Inhalable Particulate Matter (under 2.5 micrometers)">
-                  PM<sub>2.5</sub>:{' '}
-                  <strong className={`font-black ${badge.textColor}`}>
-                    {telemetry.pm25} µg/m³
-                  </strong>
-                </span>
-                <span className="text-slate-600" aria-hidden="true">|</span>
-                <span title="Coarse Inhalable Particulate Matter (under 10 micrometers)">
-                  PM<sub>10</sub>: <strong className="font-bold text-slate-200">{telemetry.pm10} µg/m³</strong>
-                </span>
-                <span className="text-slate-600" aria-hidden="true">|</span>
-                <span className="text-cyan-300 text-[11px] font-mono">
-                  DOMINANT: <strong>{telemetry.dominantPollutant || 'PM2.5'}</strong>
-                </span>
-                <span className="text-slate-600" aria-hidden="true">|</span>
-                <span className="text-slate-400 text-[10px] font-mono uppercase">
-                  {telemetry.isSimulated ? '[STANDARD_CPCB]' : '[LIVE_CALC]'}
-                </span>
-              </div>
-            </div>
-
-            {/* Diurnal Thermal Inversion & Safe Ventilation Window */}
-            <div className="flex items-center gap-2 text-slate-300 font-mono text-xs">
-              <Sun className="w-4 h-4 text-cyan-400 flex-shrink-0 animate-spin-slow" aria-hidden="true" />
-              <span className="text-slate-400 uppercase text-[11px] font-semibold">{t.safeVentWindow}</span>
-              <span className="font-bold text-cyan-300 bg-cyan-950/60 border-2 border-cyan-500/50 px-2.5 py-0.5 rounded brutal-shadow-sm">
-                {telemetry.safeVentilationWindow}
-              </span>
+          {/* Telemetry Details: PM2.5, PM10 & Safe Ventilation Window */}
+          <div className="flex flex-wrap items-center gap-3 font-mono text-xs">
+            <span title="Fine Particulate Matter">
+              PM<sub>2.5</sub>: <strong className={badge.textColor}>{telemetry.pm25} µg/m³</strong>
+            </span>
+            <span className="text-slate-600 hidden sm:inline" aria-hidden="true">|</span>
+            <span title="Coarse Particulate Matter" className="hidden sm:inline">
+              PM<sub>10</sub>: <strong className="text-slate-200">{telemetry.pm10} µg/m³</strong>
+            </span>
+            <span className="text-slate-600" aria-hidden="true">|</span>
+            <div className="flex items-center gap-1.5 text-cyan-300 bg-cyan-950/70 border-2 border-cyan-500/50 px-2.5 py-0.5 rounded-lg brutal-shadow-sm font-bold">
+              <Sun className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Safe Window: {telemetry.safeVentilationWindow}</span>
               {isLoadingTelemetry && (
-                <RefreshCw className="w-3.5 h-3.5 text-slate-400 animate-spin ml-1" aria-label="Updating telemetry..." />
+                <RefreshCw className="w-3 h-3 text-cyan-400 animate-spin ml-1" />
               )}
             </div>
-          </section>
+          </div>
         </div>
       </div>
     </header>
