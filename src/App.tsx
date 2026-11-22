@@ -182,7 +182,7 @@ export const App: React.FC = () => {
 
           {/* Right Workspace: Impact Dashboard & Action Plan (8 cols) */}
           <div className="lg:col-span-8 space-y-6">
-            <ImpactVisualizer impact={aggregatedImpact} />
+            <ImpactVisualizer impact={aggregatedImpact} pm25={telemetry.pm25} />
 
             <ActionPlanGrid
               plan={actionPlan}

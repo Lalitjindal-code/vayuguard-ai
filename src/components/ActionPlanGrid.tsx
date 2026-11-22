@@ -7,6 +7,9 @@ import {
   Home,
   RefreshCw,
   Info,
+  Share2,
+  DollarSign,
+  Gauge,
 } from 'lucide-react';
 import gsap from 'gsap';
 import {
@@ -116,6 +119,12 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
     sustainable_alternative: plan.recommendations.filter((r) => r.category === 'sustainable_alternative').length,
   };
 
+  const handleShareToWhatsApp = (title: string, desc: string, pm25Cut: number) => {
+    const text = `🌿 *VayuGuard Smog Defense Hack*\n\n*${title}*\n${desc}\n\n🛡️ *Direct Impact:* Cuts PM2.5 inhalation by ${pm25Cut}%\nShared via VayuGuard AI (Winter Smog Assistant)`;
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <section aria-labelledby="plan-section-title" className="space-y-4">
       {/* Plan Header & Winter Smog Advisory Alert */}
@@ -138,8 +147,10 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
         <div className="p-3.5 rounded-lg bg-amber-950/30 border-2 border-amber-500/50 text-xs text-amber-200 flex items-start gap-2.5 brutal-shadow-sm">
           <Info className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="space-y-0.5">
-            <span className="font-bold uppercase tracking-wider text-amber-300 font-mono">Winter Boundary Layer Trap Advisory:</span>
-            <p className="text-amber-200/90 leading-relaxed font-sans">{plan.winterSmogAdvisory}</p>
+            <strong className="font-bold text-amber-300 font-mono uppercase text-[11px]">
+              Active Winter Inversion Advisory:
+            </strong>
+            <p className="leading-relaxed">{plan.winterSmogAdvisory}</p>
           </div>
         </div>
 
@@ -198,7 +209,7 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
                   : 'bg-[#0C121B] border-slate-700 hover:border-slate-500 brutal-shadow'
               }`}
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {/* Category & Adoption Checkbox Header */}
                 <div className="flex items-center justify-between gap-2">
                   <span
@@ -224,21 +235,34 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
                   </button>
                 </div>
 
-                {/* Title & Metadata */}
-                <div>
-                  <h3 className="text-sm font-extrabold text-white font-sans leading-snug">
-                    {rec.title}
-                  </h3>
-                  <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-slate-400 font-mono font-semibold">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3 text-slate-500" aria-hidden="true" />
-                      {rec.timeframe}
-                    </span>
-                    <span>•</span>
-                    <span className="text-cyan-300">
-                      {rec.estimatedCostInr === 0 ? 'Zero-Cost / Free' : `Cost: ~₹${rec.estimatedCostInr}`}
-                    </span>
-                  </div>
+                {/* Title */}
+                <h3 className="text-sm font-extrabold text-white font-sans leading-snug">
+                  {rec.title}
+                </h3>
+
+                {/* Professional Actionability Micro-Tags (Effort, Cost, Time) */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-0.5 font-mono text-[10px] font-bold">
+                  {/* Effort Tag */}
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300">
+                    <Gauge className="w-3 h-3 text-cyan-400" />
+                    {rec.estimatedCostInr === 0 ? 'LOW EFFORT' : 'PRACTICAL BUILD'}
+                  </span>
+
+                  {/* Cost Tag */}
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border ${
+                    rec.estimatedCostInr === 0
+                      ? 'bg-emerald-950/60 border-emerald-500/60 text-emerald-300'
+                      : 'bg-amber-950/60 border-amber-500/60 text-amber-300'
+                  }`}>
+                    <DollarSign className="w-3 h-3" />
+                    {rec.estimatedCostInr === 0 ? '₹0 FREE' : `~₹${rec.estimatedCostInr}`}
+                  </span>
+
+                  {/* Timeframe Tag */}
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300">
+                    <Calendar className="w-3 h-3 text-slate-400" />
+                    {rec.timeframe}
+                  </span>
                 </div>
 
                 {/* Description */}
@@ -261,6 +285,19 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
                     Direct Impact Explanation:
                   </strong>
                   {rec.impact.directExplanation}
+                </div>
+
+                {/* 1-Click WhatsApp Community Share Button */}
+                <div className="pt-2 border-t border-slate-800/80 flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={() => handleShareToWhatsApp(rec.title, rec.description, rec.impact.pm25ReductionPercent)}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-bold uppercase rounded bg-slate-900 border border-emerald-500/60 text-emerald-300 hover:bg-emerald-950/50 hover:border-emerald-400 brutal-btn transition-colors"
+                    title="Share this hack directly to your Society or Family WhatsApp group"
+                  >
+                    <Share2 className="w-3 h-3 text-emerald-400" />
+                    <span>Share on WhatsApp</span>
+                  </button>
                 </div>
               </div>
             </article>

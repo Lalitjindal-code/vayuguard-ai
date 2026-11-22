@@ -7,6 +7,9 @@ import {
   CheckCircle2,
   TreePine,
   Sparkles,
+  Cigarette,
+  HeartPulse,
+  ArrowRight,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import gsap from 'gsap';
@@ -14,9 +17,10 @@ import { AggregatedImpact } from '../types/airQuality';
 
 interface ImpactVisualizerProps {
   impact: AggregatedImpact;
+  pm25?: number;
 }
 
-export const ImpactVisualizer: React.FC<ImpactVisualizerProps> = ({ impact }) => {
+export const ImpactVisualizer: React.FC<ImpactVisualizerProps> = ({ impact, pm25 = 285 }) => {
   const containerRef = useRef<HTMLElement>(null);
   const prevAdoptedRef = useRef<number>(impact.adoptedCount);
 
@@ -51,6 +55,18 @@ export const ImpactVisualizer: React.FC<ImpactVisualizerProps> = ({ impact }) =>
       );
     }
   }, [impact.totalPm25ReductionPct, impact.totalWeeklyCo2SavedKg]);
+
+  // Scientific Equivalence: Berkeley Earth (22 µg/m³ PM2.5 ≈ 1 cigarette/day inhaled)
+  const baselineCigsPerDay = Math.max(1, Math.round((pm25 / 22) * 10) / 10);
+  const reductionFraction = impact.totalPm25ReductionPct / 100;
+  const mitigatedCigsPerDay = Math.max(
+    0.2,
+    Math.round(baselineCigsPerDay * (1 - reductionFraction) * 10) / 10
+  );
+  const cigsAvoidedPerDay = Math.max(
+    0,
+    Math.round((baselineCigsPerDay - mitigatedCigsPerDay) * 10) / 10
+  );
 
   return (
     <section
@@ -90,6 +106,54 @@ export const ImpactVisualizer: React.FC<ImpactVisualizerProps> = ({ impact }) =>
               : 0}
             %
           </span>
+        </div>
+      </div>
+
+      {/* Visceral Health Benchmark: Cigarette Smoke Equivalence Meter */}
+      <div className="p-4 rounded-xl bg-[#130E18] border-2 border-rose-500/60 brutal-shadow space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">
+              <Cigarette className="w-4 h-4" aria-hidden="true" />
+            </div>
+            <h3 className="text-xs font-black uppercase tracking-wider text-rose-300 font-display">
+              Visceral Respiratory Health Equivalent (Berkeley Earth Scientific Benchmark)
+            </h3>
+          </div>
+          <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-black/60 text-slate-400 border border-slate-700">
+            [22 µg/m³ PM2.5 ≈ 1 Cigarette/Day]
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center pt-1">
+          {/* Baseline Exposure */}
+          <div className="p-3 rounded-lg bg-black/40 border border-rose-500/40 text-center space-y-0.5">
+            <div className="text-[11px] font-mono text-slate-400 uppercase">Current City Air Exposure</div>
+            <div className="text-xl font-black font-mono text-rose-400">
+              ~{baselineCigsPerDay} <span className="text-xs font-bold text-slate-400">cigs/day</span>
+            </div>
+            <div className="text-[10px] text-slate-500">Every family member inhaling unpurified air</div>
+          </div>
+
+          {/* Action Impact Arrow */}
+          <div className="flex flex-col items-center justify-center text-center px-2 py-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400 text-emerald-300 font-mono text-xs font-black mb-1 brutal-shadow-sm">
+              <HeartPulse className="w-3.5 h-3.5" />
+              <span>SAVING ~{cigsAvoidedPerDay} CIGS/DAY</span>
+            </div>
+            <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1">
+              {impact.totalPm25ReductionPct}% respiratory toxin cut <ArrowRight className="w-3 h-3 text-emerald-400" />
+            </span>
+          </div>
+
+          {/* Mitigated Protected Exposure */}
+          <div className="p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-center space-y-0.5">
+            <div className="text-[11px] font-mono text-emerald-400 uppercase">With VayuGuard Action Plan</div>
+            <div className="text-xl font-black font-mono text-emerald-300">
+              ~{mitigatedCigsPerDay} <span className="text-xs font-bold text-slate-400">cigs/day</span>
+            </div>
+            <div className="text-[10px] text-emerald-400/80">Filtered indoor air & peak trap avoidance</div>
+          </div>
         </div>
       </div>
 
@@ -140,9 +204,9 @@ export const ImpactVisualizer: React.FC<ImpactVisualizerProps> = ({ impact }) =>
       </div>
 
       {/* Community Multiplier Banner (Scales to 100 neighborhood households) */}
-      <div className="p-4 rounded-xl bg-[#101726] border-2 border-emerald-400/80 brutal-shadow-emerald space-y-2">
+      <div className="p-4 rounded-xl bg-[#131127] border-2 border-purple-500/80 brutal-shadow-purple space-y-2">
         <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-emerald-400" aria-hidden="true" />
+          <Users className="w-4 h-4 text-purple-400" aria-hidden="true" />
           <h3 className="text-xs font-black text-slate-100 tracking-wider uppercase font-mono">
             Community Multiplier (100 Neighborhood Households)
           </h3>
