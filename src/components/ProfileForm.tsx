@@ -8,7 +8,6 @@ import {
   FileText,
   Sparkles,
   RefreshCw,
-  ChevronDown,
 } from 'lucide-react';
 import {
   HouseholdProfile,
@@ -17,6 +16,7 @@ import {
   CookingFuel,
   VulnerabilityGroup,
 } from '../types/airQuality';
+import { NeoSelect } from './NeoSelect';
 
 interface ProfileFormProps {
   profile: HouseholdProfile;
@@ -24,6 +24,70 @@ interface ProfileFormProps {
   onSubmit: (e: React.FormEvent) => void;
   isLoading: boolean;
 }
+
+const HOUSING_OPTIONS = [
+  {
+    value: 'apartment',
+    label: 'High-Rise Apartment (Ventilation elevation)',
+    subtext: 'Upper floor air exchange; wind draft exposure',
+  },
+  {
+    value: 'independent_house',
+    label: 'Ground Floor / Independent Villa',
+    subtext: 'High ground-level particulate settling & humidity',
+  },
+  {
+    value: 'roadside_home',
+    label: 'Roadside / High-Traffic Corridor',
+    subtext: 'Direct diesel exhaust, tyre dust & heavy metals',
+  },
+];
+
+const COMMUTE_OPTIONS = [
+  {
+    value: 'solo_car',
+    label: 'Solo Car (Petrol / Diesel / CNG)',
+    subtext: 'High vehicular emissions; moderate cabin exposure',
+  },
+  {
+    value: 'two_wheeler',
+    label: 'Motorcycle / Scooter (High roadside exposure)',
+    subtext: 'Extreme roadside inhalable particulate exposure',
+  },
+  {
+    value: 'public_transit',
+    label: 'Metro / City Bus Transit',
+    subtext: 'Lowest carbon footprint; walk portions need N95',
+  },
+  {
+    value: 'ev_or_wfh',
+    label: 'Electric Vehicle / Bicycle / WFH',
+    subtext: 'Zero tailpipe emissions; minimal road exposure',
+  },
+];
+
+const FUEL_OPTIONS = [
+  {
+    value: 'lpg_with_chimney',
+    label: 'LPG / PNG Gas with Active Chimney',
+    subtext: 'Active mechanical extraction of combustion NO2',
+  },
+  {
+    value: 'lpg_no_exhaust',
+    label: 'LPG Gas without Duct Exhaust',
+    subtext: 'Trapped indoor nitrogen dioxide and moisture',
+  },
+  {
+    value: 'electric_induction',
+    label: 'Induction / Microwave / Clean Electric',
+    subtext: 'Zero indoor combustion gases or open flame',
+  },
+  {
+    value: 'biomass_coal',
+    label: 'Space Coil Heater / Biomass / Wood Fire',
+    subtext: 'Severe indoor carbon monoxide & soot hazard',
+  },
+];
 
 export const ProfileForm: React.FC<ProfileFormProps> = ({
   profile,
@@ -68,28 +132,15 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
-        {/* Housing Type */}
-        <div>
-          <label htmlFor="housing-select" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-200 mb-1.5 font-mono">
-            <Home className="w-3.5 h-3.5 text-cyan-400" aria-hidden="true" />
-            Housing Type & Location
-          </label>
-          <div className="relative">
-            <select
-              id="housing-select"
-              value={profile.housing}
-              onChange={(e) => onChange({ ...profile, housing: e.target.value as HousingType })}
-              className="w-full pl-3 pr-8 py-2 text-xs font-bold font-mono bg-[#0A0F18] border-2 border-slate-700 rounded-lg text-white hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
-            >
-              <option value="apartment">High-Rise Apartment (Ventilation elevation)</option>
-              <option value="independent_house">Ground Floor / Independent Villa</option>
-              <option value="roadside_home">Roadside / High-Traffic Corridor</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-emerald-400">
-              <ChevronDown className="w-4 h-4 stroke-[2.5]" />
-            </div>
-          </div>
-        </div>
+        {/* Housing Type (Custom Neo-Brutalist Select) */}
+        <NeoSelect
+          id="housing-select"
+          label="Housing Type & Location"
+          value={profile.housing}
+          onChange={(val) => onChange({ ...profile, housing: val as HousingType })}
+          options={HOUSING_OPTIONS}
+          icon={<Home className="w-3.5 h-3.5 text-cyan-400" aria-hidden="true" />}
+        />
 
         {/* Vulnerable Groups */}
         <div>
@@ -125,53 +176,25 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           </div>
         </div>
 
-        {/* Commute Mode */}
-        <div>
-          <label htmlFor="commute-select" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-200 mb-1.5 font-mono">
-            <Car className="w-3.5 h-3.5 text-cyan-400" aria-hidden="true" />
-            Primary Daily Commute Mode
-          </label>
-          <div className="relative">
-            <select
-              id="commute-select"
-              value={profile.commute}
-              onChange={(e) => onChange({ ...profile, commute: e.target.value as CommuteMode })}
-              className="w-full pl-3 pr-8 py-2 text-xs font-bold font-mono bg-[#0A0F18] border-2 border-slate-700 rounded-lg text-white hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
-            >
-              <option value="solo_car">Solo Car (Petrol / Diesel / CNG)</option>
-              <option value="two_wheeler">Motorcycle / Scooter (High roadside exposure)</option>
-              <option value="public_transit">Metro / City Bus Transit</option>
-              <option value="ev_or_wfh">Electric Vehicle / Bicycle / WFH</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-emerald-400">
-              <ChevronDown className="w-4 h-4 stroke-[2.5]" />
-            </div>
-          </div>
-        </div>
+        {/* Commute Mode (Custom Neo-Brutalist Select) */}
+        <NeoSelect
+          id="commute-select"
+          label="Primary Daily Commute Mode"
+          value={profile.commute}
+          onChange={(val) => onChange({ ...profile, commute: val as CommuteMode })}
+          options={COMMUTE_OPTIONS}
+          icon={<Car className="w-3.5 h-3.5 text-cyan-400" aria-hidden="true" />}
+        />
 
-        {/* Cooking & Heating Fuel */}
-        <div>
-          <label htmlFor="fuel-select" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-200 mb-1.5 font-mono">
-            <Flame className="w-3.5 h-3.5 text-orange-400" aria-hidden="true" />
-            Indoor Cooking & Winter Heating
-          </label>
-          <div className="relative">
-            <select
-              id="fuel-select"
-              value={profile.cookingFuel}
-              onChange={(e) => onChange({ ...profile, cookingFuel: e.target.value as CookingFuel })}
-              className="w-full pl-3 pr-8 py-2 text-xs font-bold font-mono bg-[#0A0F18] border-2 border-slate-700 rounded-lg text-white hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
-            >
-              <option value="lpg_with_chimney">LPG / PNG Gas with Active Chimney</option>
-              <option value="lpg_no_exhaust">LPG Gas without Duct Exhaust</option>
-              <option value="electric_induction">Induction / Microwave / Clean Electric</option>
-              <option value="biomass_coal">Space Coil Heater / Biomass / Wood Fire</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-emerald-400">
-              <ChevronDown className="w-4 h-4 stroke-[2.5]" />
-            </div>
-          </div>
-        </div>
+        {/* Cooking & Heating Fuel (Custom Neo-Brutalist Select) */}
+        <NeoSelect
+          id="fuel-select"
+          label="Indoor Cooking & Winter Heating"
+          value={profile.cookingFuel}
+          onChange={(val) => onChange({ ...profile, cookingFuel: val as CookingFuel })}
+          options={FUEL_OPTIONS}
+          icon={<Flame className="w-3.5 h-3.5 text-orange-400" aria-hidden="true" />}
+        />
 
         {/* Specific Notes (Sanitized) */}
         <div>

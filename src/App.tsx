@@ -16,6 +16,7 @@ import { ImpactVisualizer } from './components/ImpactVisualizer';
 import { ActionPlanGrid } from './components/ActionPlanGrid';
 import { InversionTimeline } from './components/InversionTimeline';
 import { SmogChatCopilot } from './components/SmogChatCopilot';
+import { DailyDefenseChecklist } from './components/DailyDefenseChecklist';
 import { PurifierCalculatorModal } from './components/PurifierCalculatorModal';
 import { RwaActionKitModal } from './components/RwaActionKitModal';
 import { CommuteCompareModal } from './components/CommuteCompareModal';
@@ -164,27 +165,27 @@ export const App: React.FC = () => {
       />
 
       {/* Semantic Landmark: Main Content */}
-      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 space-y-8">
         {/* 24-Hour Diurnal Inversion & Smog Trap Timeline */}
         <InversionTimeline hourlyForecast={telemetry.hourlyForecast} />
 
-        {/* Responsive 12-Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Rail: Household Context & Smog Copilot (4 cols, sticky on desktop to prevent empty side space) */}
-          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto pr-1">
-            <ProfileForm
-              profile={profile}
-              onChange={setProfile}
-              onSubmit={handleGeneratePlan}
-              isLoading={isLoadingPlan}
-            />
+        {/* Responsive 12-Column Layout (stretches column heights so sticky left rail tracks full action plan) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Rail: Household Context & Daily Defense Tracker (4 cols) */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="scroll-mt-36">
+              <ProfileForm
+                profile={profile}
+                onChange={setProfile}
+                onSubmit={handleGeneratePlan}
+                isLoading={isLoadingPlan}
+              />
+            </div>
 
-            {/* Smog Copilot Interactive Assistant - fills left column space seamlessly */}
-            <SmogChatCopilot
-              profile={profile}
-              telemetry={telemetry}
-              userApiKey={customApiKey}
-            />
+            {/* Daily Winter Smog Defense Tracker - sticks cleanly below header (140px offset) so it never hides behind header */}
+            <div className="lg:sticky lg:top-[140px] z-10">
+              <DailyDefenseChecklist />
+            </div>
           </div>
 
           {/* Right Workspace: Impact Dashboard & Action Plan (8 cols) */}
@@ -201,6 +202,13 @@ export const App: React.FC = () => {
             />
           </div>
         </div>
+
+        {/* Full-Width Neo-Brutalist Smog Copilot Assistant (At very bottom of page) */}
+        <SmogChatCopilot
+          profile={profile}
+          telemetry={telemetry}
+          userApiKey={customApiKey}
+        />
       </main>
 
       {/* Semantic Landmark: Footer */}
