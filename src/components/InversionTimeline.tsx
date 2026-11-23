@@ -168,14 +168,40 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
           </div>
         </div>
 
-        {/* Interactive SVG Canvas */}
+        {/* Interactive SVG Canvas with WCAG 2.1 AA Slider Semantics for Keyboard Accessibility */}
         <div
           ref={graphRef}
+          role="slider"
+          tabIndex={0}
+          aria-label="24-Hour Diurnal Atmospheric Inversion Scrubber"
+          aria-valuenow={currentPoint.hour}
+          aria-valuemin={0}
+          aria-valuemax={23}
+          aria-valuetext={`${currentPoint.time}, AQI ${currentPoint.aqi}, Mixing Height ${currentHeight} meters, ${
+            currentPoint.isSafeWindow
+              ? 'Safe Solar Ventilation Window'
+              : currentPoint.inversionRisk + ' Inversion Risk'
+          }`}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+              e.preventDefault();
+              setSelectedHourIdx((prev) => Math.min(23, prev + 1));
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+              e.preventDefault();
+              setSelectedHourIdx((prev) => Math.max(0, prev - 1));
+            } else if (e.key === 'Home') {
+              e.preventDefault();
+              setSelectedHourIdx(0);
+            } else if (e.key === 'End') {
+              e.preventDefault();
+              setSelectedHourIdx(23);
+            }
+          }}
           onPointerDown={(e) => handlePointer(e.clientX)}
           onPointerMove={(e) => {
             if (e.buttons === 1) handlePointer(e.clientX);
           }}
-          className="relative w-full h-44 bg-slate-950 rounded-lg overflow-hidden border border-slate-800/90 cursor-crosshair select-none touch-none"
+          className="relative w-full h-44 bg-slate-950 rounded-lg overflow-hidden border border-slate-800/90 cursor-crosshair select-none touch-none focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
         >
           <svg
             className="w-full h-full"

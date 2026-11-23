@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Key, Shield, CheckCircle, ExternalLink } from 'lucide-react';
+import { X, Key, Shield, CheckCircle, ExternalLink, Eye, EyeOff } from 'lucide-react';
 
 interface ApiKeyModalProps {
   isOpen: boolean;
@@ -15,6 +15,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
   onSaveKey,
 }) => {
   const [inputKey, setInputKey] = useState(currentKey);
+  const [showKey, setShowKey] = useState(false);
   const [showSavedFeedback, setShowSavedFeedback] = useState(false);
 
   if (!isOpen) return null;
@@ -33,6 +34,8 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
     setInputKey('');
     onSaveKey('');
   };
+
+  const isLikelyValidFormat = !inputKey.trim() || inputKey.trim().startsWith('AIza');
 
   return (
     <div
@@ -68,16 +71,31 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
             <label htmlFor="gemini-key-input" className="block text-xs font-bold uppercase tracking-wider text-slate-200 mb-1.5 font-mono">
               Google Gemini API Key
             </label>
-            <input
-              id="gemini-key-input"
-              type="password"
-              placeholder="AIzaSy..."
-              value={inputKey}
-              onChange={(e) => setInputKey(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-emerald-400 brutal-shadow-sm"
-              autoComplete="off"
-              spellCheck="false"
-            />
+            <div className="relative">
+              <input
+                id="gemini-key-input"
+                type={showKey ? 'text' : 'password'}
+                placeholder="AIzaSy..."
+                value={inputKey}
+                onChange={(e) => setInputKey(e.target.value)}
+                className="w-full pl-3.5 pr-10 py-2 text-xs font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-emerald-400 brutal-shadow-sm"
+                autoComplete="off"
+                spellCheck="false"
+              />
+              <button
+                type="button"
+                onClick={() => setShowKey(!showKey)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-200"
+                aria-label={showKey ? 'Hide API key' : 'Show API key'}
+              >
+                {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            {!isLikelyValidFormat && (
+              <p className="text-[11px] text-amber-400 font-mono mt-1">
+                Note: Standard Google Gemini API keys typically start with "AIzaSy..."
+              </p>
+            )}
           </div>
 
           <div className="p-3.5 rounded-lg bg-[#111824] border-2 border-slate-800 space-y-2 text-xs text-slate-300 font-sans leading-relaxed">
@@ -93,7 +111,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
             <a
               href="https://aistudio.google.com/app/apikey"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-mono text-[11px] font-bold"
             >
               Get free Gemini API Key <ExternalLink className="w-3 h-3" />

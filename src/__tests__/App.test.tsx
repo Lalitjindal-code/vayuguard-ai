@@ -89,8 +89,15 @@ describe('VayuGuard AI Full Application (src/App.tsx)', () => {
     });
   });
 
-  it('opens and closes the BYOK API Key modal properly', () => {
+  it('opens and closes the BYOK API Key modal properly', async () => {
     render(<App />);
+
+    // Wait for initial async plan generation to settle to prevent unhandled act() warnings
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /Generate Personalized Plan/i })
+      ).toBeInTheDocument();
+    });
 
     // Click desktop API key button
     const keyButtons = screen.getAllByLabelText(/Set Gemini API Key|Manage Gemini API Key|Configure Gemini API Key/i);
