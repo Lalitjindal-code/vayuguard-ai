@@ -17,6 +17,38 @@ import {
   RecommendationCategory,
 } from '../types/airQuality';
 
+/**
+ * Returns the display metadata for a given recommendation category.
+ * Defined at module level (not inside the component) to avoid re-allocation on every render.
+ */
+function getCategoryMeta(cat: RecommendationCategory): {
+  label: string;
+  icon: React.ReactElement;
+  badgeColor: string;
+} {
+  switch (cat) {
+    case 'routine':
+      return {
+        label: 'Daily Routine',
+        icon: <Clock className="w-3.5 h-3.5" aria-hidden="true" />,
+        badgeColor: 'bg-indigo-950/80 border-2 border-indigo-500 text-indigo-200',
+      };
+    case 'indoor_hack':
+      return {
+        label: 'Indoor Air Hack',
+        icon: <Home className="w-3.5 h-3.5" aria-hidden="true" />,
+        badgeColor: 'bg-cyan-950/80 border-2 border-cyan-500 text-cyan-200',
+      };
+    case 'sustainable_alternative':
+    default:
+      return {
+        label: 'Sustainable Swap',
+        icon: <Zap className="w-3.5 h-3.5" aria-hidden="true" />,
+        badgeColor: 'bg-emerald-950/80 border-2 border-emerald-500 text-emerald-200',
+      };
+  }
+}
+
 interface ActionPlanGridProps {
   plan: PersonalizedActionPlan | null;
   adoptedIds: Set<string>;
@@ -87,30 +119,6 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
     if (activeCategory === 'all') return true;
     return rec.category === activeCategory;
   });
-
-  const getCategoryMeta = (cat: RecommendationCategory) => {
-    switch (cat) {
-      case 'routine':
-        return {
-          label: 'Daily Routine',
-          icon: <Clock className="w-3.5 h-3.5" aria-hidden="true" />,
-          badgeColor: 'bg-indigo-950/80 border-2 border-indigo-500 text-indigo-200',
-        };
-      case 'indoor_hack':
-        return {
-          label: 'Indoor Air Hack',
-          icon: <Home className="w-3.5 h-3.5" aria-hidden="true" />,
-          badgeColor: 'bg-cyan-950/80 border-2 border-cyan-500 text-cyan-200',
-        };
-      case 'sustainable_alternative':
-      default:
-        return {
-          label: 'Sustainable Swap',
-          icon: <Zap className="w-3.5 h-3.5" aria-hidden="true" />,
-          badgeColor: 'bg-emerald-950/80 border-2 border-emerald-500 text-emerald-200',
-        };
-    }
-  };
 
   const counts = {
     all: plan.recommendations.length,

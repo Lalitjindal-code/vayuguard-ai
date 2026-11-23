@@ -95,7 +95,7 @@ export function generateDeterministicPlan(
       title: 'Consolidated Trip-Chaining (Eliminate Cold Starts)',
       description:
         'Catalytic converters and two-wheeler engines emit 60% of their trip emissions during the first 5 minutes of a cold start. Batch grocery, pharmacy, and school errands into a single continuous loop rather than 3 separate cold trips.',
-    timeframe: 'Weekly planning',
+      timeframe: 'Weekly planning',
     estimatedCostInr: 0,
     impact: {
       pm25ReductionPercent: 15,

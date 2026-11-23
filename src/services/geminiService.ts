@@ -69,6 +69,19 @@ export function validateActionPlan(data: unknown): data is PersonalizedActionPla
 }
 
 /**
+ * Resolves the effective Gemini API key from the BYOK argument or the environment variable.
+ * Centralised to avoid DRY violations across multiple async service functions.
+ */
+function resolveApiKey(userApiKey?: string): string | undefined {
+  return (
+    userApiKey?.trim() ||
+    (typeof import.meta !== 'undefined' && import.meta.env
+      ? (import.meta.env.VITE_GEMINI_API_KEY as string | undefined)?.trim()
+      : undefined)
+  );
+}
+
+/**
  * Builds the XML-grounded context block for prompt injection defense.
  */
 function buildContextPrompt(profile: HouseholdProfile, telemetry: AirQualityTelemetry): string {
@@ -110,12 +123,8 @@ export async function generatePersonalizedPlan(
     return cached;
   }
 
-  // 2. Resolve API key from argument or environment
-  const effectiveKey =
-    userApiKey?.trim() ||
-    (typeof import.meta !== 'undefined' && import.meta.env
-      ? (import.meta.env.VITE_GEMINI_API_KEY as string | undefined)?.trim()
-      : undefined);
+  // 2. Resolve API key from argument or environment (DRY: uses shared resolveApiKey helper)
+  const effectiveKey = resolveApiKey(userApiKey);
 
   // If no API key is provided, execute deterministic context engine
   if (!effectiveKey) {
@@ -247,11 +256,7 @@ export async function askSmogCopilot(
     return 'Please enter a question regarding winter smog, indoor air quality, or low-emission routines.';
   }
 
-  const effectiveKey =
-    userApiKey?.trim() ||
-    (typeof import.meta !== 'undefined' && import.meta.env
-      ? (import.meta.env.VITE_GEMINI_API_KEY as string | undefined)?.trim()
-      : undefined);
+  const effectiveKey = resolveApiKey(userApiKey);
 
   if (!effectiveKey) {
     return getDeterministicChatReply(sanitized, profile, telemetry);

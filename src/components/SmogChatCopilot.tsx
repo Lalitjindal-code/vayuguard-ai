@@ -32,14 +32,25 @@ export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome',
-      sender: 'assistant',
-      text: `Namaste! I am your **VayuGuard Smog Copilot**, grounded in live ${telemetry.city} air quality (CPCB AQI ${telemetry.aqi} ${telemetry.severity}) and your family profile. Ask any follow-up questions on safe outdoor hours, DIY filter builds, or community action!`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    },
-  ]);
+
+  /**
+   * Welcome message is initialized from telemetry at mount, then kept in sync
+   * whenever the user switches cities so stale AQI data never persists in chat history.
+   */
+  const buildWelcomeMessage = (t: typeof telemetry): ChatMessage => ({
+    id: 'welcome',
+    sender: 'assistant',
+    text: `Namaste! I am your **VayuGuard Smog Copilot**, grounded in live ${t.city} air quality (CPCB AQI ${t.aqi} ${t.severity}) and your family profile. Ask any follow-up questions on safe outdoor hours, DIY filter builds, or community action!`,
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  });
+
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [buildWelcomeMessage(telemetry)]);
+
+  // Keep the welcome message in sync when the user switches cities
+  useEffect(() => {
+    setMessages([buildWelcomeMessage(telemetry)]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [telemetry.city, telemetry.aqi]);
 
   const quickPrompts = [
     'Is it safe for my 4-year-old to play outside at 4 PM today?',

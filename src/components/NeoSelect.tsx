@@ -65,7 +65,9 @@ export const NeoSelect: React.FC<NeoSelectProps> = ({
         {label}
       </label>
 
-      {/* Accessible native select for screen readers and unit test queries (getByLabelText) */}
+      {/* Accessible native select — visually hidden but fully accessible to screen readers
+          and unit test selectors (getByLabelText). Do NOT set aria-hidden here as this
+          element carries the accessible label association via htmlFor on the <label> above. */}
       <select
         id={id}
         value={value}

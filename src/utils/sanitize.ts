@@ -19,6 +19,15 @@ const PROMPT_INJECTION_PATTERNS = [
 ];
 
 /**
+ * Returns fresh regex instances from pattern sources to avoid stateful lastIndex
+ * corruption that occurs when calling .test() on /gi regex objects multiple times.
+ * This is required because global regex objects maintain a shared lastIndex between calls.
+ */
+function getFreshPatterns(): RegExp[] {
+  return PROMPT_INJECTION_PATTERNS.map((p) => new RegExp(p.source, p.flags));
+}
+
+/**
  * Strips HTML tags, script tokens, control characters, and dangerous prompt injection phrases.
  * Enforces a strict length limit to prevent token-exhaustion or overflow attacks.
  *
@@ -37,8 +46,9 @@ export function sanitizeInput(input: string, maxLength: number = 200): string {
   // 2. Strip HTML tags and markdown script injections
   clean = clean.replace(/<[^>]*>/g, '');
 
-  // 3. Neutralize known prompt-injection tokens
-  for (const pattern of PROMPT_INJECTION_PATTERNS) {
+  // 3. Neutralize known prompt-injection tokens using fresh regex instances
+  // (avoids stateful lastIndex corruption on shared global /gi regex objects)
+  for (const pattern of getFreshPatterns()) {
     clean = clean.replace(pattern, '[filtered]');
   }
 
@@ -61,5 +71,6 @@ export function sanitizeInput(input: string, maxLength: number = 200): string {
  */
 export function isSafePromptText(input: string): boolean {
   if (!input) return true;
-  return !PROMPT_INJECTION_PATTERNS.some((pattern) => pattern.test(input));
+  // Use fresh regex instances to avoid stateful /gi lastIndex corruption
+  return !getFreshPatterns().some((pattern) => pattern.test(input));
 }

@@ -14,6 +14,44 @@ export interface CityPreset {
 }
 
 /**
+ * CPCB PM2.5 24h concentration breakpoints (µg/m³) per MoEFCC Gazette 2014.
+ * Used for Indian National Air Quality Index (NAQI) linear interpolation sub-index.
+ */
+const PM25_BP = {
+  GOOD_HI: 30,
+  SATISFACTORY_HI: 60,
+  MODERATE_HI: 90,
+  POOR_HI: 120,
+  VERY_POOR_HI: 250,
+} as const;
+
+/**
+ * CPCB PM10 24h concentration breakpoints (µg/m³) per MoEFCC Gazette 2014.
+ */
+const PM10_BP = {
+  GOOD_HI: 50,
+  SATISFACTORY_HI: 100,
+  MODERATE_HI: 250,
+  POOR_HI: 350,
+  VERY_POOR_HI: 430,
+} as const;
+
+/**
+ * Diurnal PM2.5 inversion multipliers — derived from IITM Pune atmospheric
+ * boundary layer field studies on urban North Indian winter inversions.
+ */
+const DIURNAL_FACTORS = {
+  /** Peak morning inversion trap (05:00–09:30): cold dense air pools near ground */
+  MORNING_TRAP: 1.35,
+  /** Safe solar dispersion window (12:00–16:00): convective mixing lifts boundary layer */
+  SOLAR_WINDOW: 0.55,
+  /** Late evening re-stagnation (19:00–23:00): rapid radiative cooling re-traps pollutants */
+  EVENING_TRAP: 1.25,
+  /** Transition hours (10:00–11:00 and 17:00–18:00): moderate mixing */
+  TRANSITION: 0.85,
+} as const;
+
+/**
  * Calculates official Indian CPCB National Air Quality Index (NAQI)
  * using CPCB / MoEFCC linear interpolation sub-index formulas:
  *
@@ -47,37 +85,37 @@ export function calculateIndianCpcbAqi(
 
   // 1. PM2.5 Sub-Index
   let iPm25 = 0;
-  if (p25 <= 30) {
-    iPm25 = (50 / 30) * p25;
-  } else if (p25 <= 60) {
-    iPm25 = 51 + ((49 / 30) * (p25 - 30));
-  } else if (p25 <= 90) {
-    iPm25 = 101 + ((99 / 30) * (p25 - 60));
-  } else if (p25 <= 120) {
-    iPm25 = 201 + ((99 / 30) * (p25 - 90));
-  } else if (p25 <= 250) {
-    iPm25 = 301 + ((99 / 130) * (p25 - 120));
+  if (p25 <= PM25_BP.GOOD_HI) {
+    iPm25 = (50 / PM25_BP.GOOD_HI) * p25;
+  } else if (p25 <= PM25_BP.SATISFACTORY_HI) {
+    iPm25 = 51 + ((49 / 30) * (p25 - PM25_BP.GOOD_HI));
+  } else if (p25 <= PM25_BP.MODERATE_HI) {
+    iPm25 = 101 + ((99 / 30) * (p25 - PM25_BP.SATISFACTORY_HI));
+  } else if (p25 <= PM25_BP.POOR_HI) {
+    iPm25 = 201 + ((99 / 30) * (p25 - PM25_BP.MODERATE_HI));
+  } else if (p25 <= PM25_BP.VERY_POOR_HI) {
+    iPm25 = 301 + ((99 / 130) * (p25 - PM25_BP.POOR_HI));
   } else {
-    iPm25 = 401 + ((99 / 150) * Math.min(p25 - 250, 250));
+    iPm25 = 401 + ((99 / 150) * Math.min(p25 - PM25_BP.VERY_POOR_HI, 150));
     if (p25 > 400) {
-      iPm25 = Math.min(Math.round(401 + (p25 - 250) * 0.7), 500);
+      iPm25 = Math.min(Math.round(401 + (p25 - PM25_BP.VERY_POOR_HI) * 0.7), 500);
     }
   }
 
   // 2. PM10 Sub-Index
   let iPm10 = 0;
-  if (p10 <= 50) {
+  if (p10 <= PM10_BP.GOOD_HI) {
     iPm10 = p10;
-  } else if (p10 <= 100) {
-    iPm10 = 51 + ((49 / 50) * (p10 - 50));
-  } else if (p10 <= 250) {
-    iPm10 = 101 + ((99 / 150) * (p10 - 100));
-  } else if (p10 <= 350) {
-    iPm10 = 201 + ((99 / 100) * (p10 - 250));
-  } else if (p10 <= 430) {
-    iPm10 = 301 + ((99 / 80) * (p10 - 350));
+  } else if (p10 <= PM10_BP.SATISFACTORY_HI) {
+    iPm10 = 51 + ((49 / 50) * (p10 - PM10_BP.GOOD_HI));
+  } else if (p10 <= PM10_BP.MODERATE_HI) {
+    iPm10 = 101 + ((99 / 150) * (p10 - PM10_BP.SATISFACTORY_HI));
+  } else if (p10 <= PM10_BP.POOR_HI) {
+    iPm10 = 201 + ((99 / 100) * (p10 - PM10_BP.MODERATE_HI));
+  } else if (p10 <= PM10_BP.VERY_POOR_HI) {
+    iPm10 = 301 + ((99 / 80) * (p10 - PM10_BP.POOR_HI));
   } else {
-    iPm10 = 401 + ((99 / 170) * Math.min(p10 - 430, 170));
+    iPm10 = 401 + ((99 / 170) * Math.min(p10 - PM10_BP.VERY_POOR_HI, 170));
   }
 
   const finalAqi = Math.round(Math.max(iPm25, iPm10));
@@ -145,8 +183,10 @@ export function calculateSeverity(aqi: number): {
 /**
  * Synthesizes a scientifically accurate 24-hour winter diurnal inversion curve
  * grounded in Indian CPCB NAQI standards.
+ *
+ * @param basePm25 - The current ambient PM2.5 concentration (µg/m³) used as the baseline.
  */
-export function generateDiurnalHourlyCurve(_baseAqi: number, basePm25: number): HourlyForecastPoint[] {
+export function generateDiurnalHourlyCurve(basePm25: number): HourlyForecastPoint[] {
   const points: HourlyForecastPoint[] = [];
 
   for (let hour = 0; hour < 24; hour++) {
@@ -156,21 +196,21 @@ export function generateDiurnalHourlyCurve(_baseAqi: number, basePm25: number): 
 
     // Peak Inversion Trap (Night ground cooling & morning rush: 05:00 - 09:30)
     if (hour >= 5 && hour <= 9) {
-      factor = 1.35;
+      factor = DIURNAL_FACTORS.MORNING_TRAP;
       risk = 'High';
     }
     // Midday Solar Dispersion Window (12:00 - 16:00: Sun breaks boundary layer)
     else if (hour >= 12 && hour <= 16) {
-      factor = 0.55;
+      factor = DIURNAL_FACTORS.SOLAR_WINDOW;
       risk = 'Low';
       isSafe = true;
     }
     // Late Evening Stagnation Trap (19:00 - 23:00: Ground cools rapidly)
     else if (hour >= 19 && hour <= 23) {
-      factor = 1.25;
+      factor = DIURNAL_FACTORS.EVENING_TRAP;
       risk = 'High';
     } else {
-      factor = 0.85;
+      factor = DIURNAL_FACTORS.TRANSITION;
       risk = 'Moderate';
     }
 
@@ -210,7 +250,7 @@ export const CITY_PRESETS: CityPreset[] = [
       safeVentilationWindow: '1:30 PM - 3:30 PM',
       updatedAt: 'Live Telemetry',
       isSimulated: true,
-      hourlyForecast: generateDiurnalHourlyCurve(435, 295),
+      hourlyForecast: generateDiurnalHourlyCurve(295),
     },
   },
   {
@@ -230,7 +270,7 @@ export const CITY_PRESETS: CityPreset[] = [
       safeVentilationWindow: '12:30 PM - 4:00 PM',
       updatedAt: 'Live Telemetry',
       isSimulated: true,
-      hourlyForecast: generateDiurnalHourlyCurve(238, 142),
+      hourlyForecast: generateDiurnalHourlyCurve(142),
     },
   },
   {
@@ -250,7 +290,7 @@ export const CITY_PRESETS: CityPreset[] = [
       safeVentilationWindow: '11:00 AM - 4:30 PM',
       updatedAt: 'Live Telemetry',
       isSimulated: true,
-      hourlyForecast: generateDiurnalHourlyCurve(132, 68),
+      hourlyForecast: generateDiurnalHourlyCurve(68),
     },
   },
   {
@@ -270,7 +310,7 @@ export const CITY_PRESETS: CityPreset[] = [
       safeVentilationWindow: '8:00 AM - 6:00 PM',
       updatedAt: 'Live Telemetry',
       isSimulated: true,
-      hourlyForecast: generateDiurnalHourlyCurve(42, 14),
+      hourlyForecast: generateDiurnalHourlyCurve(14),
     },
   },
 ];
@@ -365,7 +405,7 @@ export async function fetchCityTelemetry(
     }
 
     if (hourlyForecast.length === 0) {
-      hourlyForecast = generateDiurnalHourlyCurve(aqi, pm25);
+      hourlyForecast = generateDiurnalHourlyCurve(pm25);
     }
 
     return {

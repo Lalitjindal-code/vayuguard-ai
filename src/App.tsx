@@ -121,11 +121,12 @@ export const App: React.FC = () => {
     }
   };
 
-  // Initial Plan Generation on Mount
+  // Initial Plan Generation on Mount — depends only on city to avoid double-fire
+  // when AQI severity changes within the same city after telemetry refresh.
   useEffect(() => {
     handleGeneratePlan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [telemetry.city, telemetry.severity]);
+  }, [telemetry.city]);
 
   // Toggle Action Adoption
   const handleToggleAdopt = (id: string) => {
