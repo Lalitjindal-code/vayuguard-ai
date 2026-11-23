@@ -27,10 +27,27 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
 4. Shroud: Cut a circular 14" hole from the fan box cardboard and tape it to the front face to boost air velocity.
 5. Operation: Run in a ${result.roomAreaSqFt} sq.ft room for 45 minutes to achieve ${result.achRating} air changes/hr.`;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(assemblySteps);
-    setCopiedSteps(true);
-    setTimeout(() => setCopiedSteps(false), 1500);
+  const handleCopy = async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(assemblySteps);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = assemblySteps;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopiedSteps(true);
+      setTimeout(() => setCopiedSteps(false), 1500);
+    } catch {
+      // Fallback: indicate copy attempted
+      setCopiedSteps(true);
+      setTimeout(() => setCopiedSteps(false), 1500);
+    }
   };
 
   return (

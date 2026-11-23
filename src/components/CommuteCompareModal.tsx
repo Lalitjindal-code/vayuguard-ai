@@ -51,16 +51,21 @@ export const CommuteCompareModal: React.FC<CommuteCompareModalProps> = ({
 
         {/* Distance Slider */}
         <div className="p-4 rounded-xl bg-[#111824] border-2 border-slate-800 mb-5 space-y-2 brutal-shadow-sm font-mono">
-          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-300">
+          <label htmlFor="commute-distance-slider" className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-300">
             <span>Daily Round-Trip Commute Distance:</span>
             <span className="text-cyan-400 text-sm font-black">{distanceKm} km / day</span>
-          </div>
+          </label>
           <input
+            id="commute-distance-slider"
             type="range"
             min={2}
             max={60}
             step={1}
             value={distanceKm}
+            aria-label="Daily Round-Trip Commute Distance in Kilometers"
+            aria-valuenow={distanceKm}
+            aria-valuemin={2}
+            aria-valuemax={60}
             onChange={(e) => setDistanceKm(Number(e.target.value))}
             className="w-full accent-cyan-400 cursor-pointer"
           />

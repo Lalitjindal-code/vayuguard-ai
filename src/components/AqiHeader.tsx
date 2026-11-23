@@ -289,7 +289,7 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
                   id="city-select"
                   value={selectedCity}
                   onChange={(e) => onCityChange(e.target.value)}
-                  className="w-full pl-8 pr-6 py-1 text-xs font-bold font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-slate-100 hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
+                  className="w-full pl-8 pr-7 py-1 text-xs font-bold font-mono bg-slate-900 border-2 border-slate-700 rounded-lg text-slate-100 hover:border-slate-500 focus:border-emerald-400 brutal-shadow-sm cursor-pointer appearance-none"
                 >
                   <option value="Delhi NCR">Delhi NCR</option>
                   <option value="Bhopal">Bhopal</option>
@@ -302,6 +302,9 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
                   <option value="Patna">Patna</option>
                   <option value="Lucknow">Lucknow</option>
                 </select>
+                <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none text-slate-400">
+                  <span className="text-[10px]">▼</span>
+                </div>
               </div>
 
               {CITY_PRESETS.map((preset) => (
