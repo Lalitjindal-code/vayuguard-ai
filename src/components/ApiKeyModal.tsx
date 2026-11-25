@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Key, Shield, CheckCircle, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 
@@ -18,6 +18,21 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
   const [inputKey, setInputKey] = useState(currentKey);
   const [showKey, setShowKey] = useState(false);
   const [showSavedFeedback, setShowSavedFeedback] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync draft input whenever the modal opens or external key changes
+  useEffect(() => {
+    if (isOpen) {
+      setInputKey(currentKey);
+      setShowKey(false);
+    }
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    };
+  }, [isOpen, currentKey]);
 
   useEscapeKey(isOpen, onClose);
 
@@ -27,7 +42,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
     e.preventDefault();
     onSaveKey(inputKey.trim());
     setShowSavedFeedback(true);
-    setTimeout(() => {
+    closeTimerRef.current = setTimeout(() => {
       setShowSavedFeedback(false);
       onClose();
     }, 800);

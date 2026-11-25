@@ -111,51 +111,52 @@ export const DailyDefenseChecklist: React.FC = () => {
       </div>
 
       {/* Checklist Items */}
-      <div className="space-y-2 pt-1" role="list" aria-label="Winter Smog Defense Protocols">
+      <ul className="space-y-2 pt-1" aria-label="Winter Smog Defense Protocols">
         {DEFAULT_PROTOCOLS.map((protocol) => {
           const isDone = completedIds.has(protocol.id);
           return (
-            <button
-              key={protocol.id}
-              type="button"
-              role="listitem"
-              onClick={() => toggleItem(protocol.id)}
-              className={`w-full p-2.5 rounded-lg border-2 text-left transition-all brutal-btn flex items-start gap-2.5 ${
-                isDone
-                  ? 'bg-emerald-950/20 border-emerald-500/50 text-slate-100 brutal-shadow-emerald'
-                  : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:border-slate-600 brutal-shadow-sm'
-              }`}
-            >
-              <div className="pt-0.5 flex-shrink-0">
-                {isDone ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 stroke-[2.5]" />
-                ) : (
-                  <Circle className="w-4 h-4 text-slate-600 stroke-[2]" />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-1 mb-0.5">
-                  <span
-                    className={`text-xs font-mono font-bold leading-tight ${
-                      isDone ? 'text-white' : 'text-slate-300'
-                    }`}
-                  >
-                    {protocol.title}
-                  </span>
+            <li key={protocol.id}>
+              <button
+                type="button"
+                aria-pressed={isDone}
+                onClick={() => toggleItem(protocol.id)}
+                className={`w-full p-2.5 rounded-lg border-2 text-left transition-all brutal-btn flex items-start gap-2.5 ${
+                  isDone
+                    ? 'bg-emerald-950/20 border-emerald-500/50 text-slate-100 brutal-shadow-emerald'
+                    : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:border-slate-600 brutal-shadow-sm'
+                }`}
+              >
+                <div className="pt-0.5 flex-shrink-0">
+                  {isDone ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 stroke-[2.5]" aria-hidden="true" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-slate-600 stroke-[2]" aria-hidden="true" />
+                  )}
                 </div>
-                <div className="flex items-center gap-2 text-[10px] font-mono">
-                  <span className="text-cyan-400 flex items-center gap-1">
-                    <Clock className="w-2.5 h-2.5" />
-                    {protocol.timeframe}
-                  </span>
-                  <span className="text-slate-500">•</span>
-                  <span className="text-slate-400 truncate">{protocol.impact}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1 mb-0.5">
+                    <span
+                      className={`text-xs font-mono font-bold leading-tight ${
+                        isDone ? 'text-white' : 'text-slate-300'
+                      }`}
+                    >
+                      {protocol.title}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] font-mono">
+                    <span className="text-cyan-400 flex items-center gap-1">
+                      <Clock className="w-2.5 h-2.5" aria-hidden="true" />
+                      {protocol.timeframe}
+                    </span>
+                    <span className="text-slate-500" aria-hidden="true">•</span>
+                    <span className="text-slate-400 truncate">{protocol.impact}</span>
+                  </div>
                 </div>
-              </div>
-            </button>
+              </button>
+            </li>
           );
         })}
-      </div>
+      </ul>
 
       {/* Footnote */}
       <div className="pt-2 border-t border-slate-800/80 flex items-center gap-2 text-[11px] text-slate-500 font-mono">

@@ -37,6 +37,9 @@ export default {
         sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
+      gridTemplateColumns: {
+        '24': 'repeat(24, minmax(0, 1fr))',
+      },
       boxShadow: {
         'brutal': '4px 4px 0px 0px #000000',
         'brutal-lg': '6px 6px 0px 0px #000000',

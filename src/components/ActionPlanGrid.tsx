@@ -300,7 +300,7 @@ export const ActionPlanGrid: React.FC<ActionPlanGridProps> = ({
                 </div>
 
                 <div className="pt-2 border-t-2 border-slate-800 text-slate-300 leading-relaxed text-[11px] font-sans">
-                  <strong className="text-white uppercase font-mono font-bold block mb-0.5 text-[10px] tracking-wider text-emerald-300">
+                  <strong className="uppercase font-mono font-bold block mb-0.5 text-[10px] tracking-wider text-emerald-300">
                     Direct Impact Explanation:
                   </strong>
                   {rec.impact.directExplanation}
