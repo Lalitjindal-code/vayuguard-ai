@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Key, Shield, CheckCircle, ExternalLink, Eye, EyeOff } from 'lucide-react';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 
 interface ApiKeyModalProps {
   isOpen: boolean;
@@ -17,6 +18,8 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
   const [inputKey, setInputKey] = useState(currentKey);
   const [showKey, setShowKey] = useState(false);
   const [showSavedFeedback, setShowSavedFeedback] = useState(false);
+
+  useEscapeKey(isOpen, onClose);
 
   if (!isOpen) return null;
 

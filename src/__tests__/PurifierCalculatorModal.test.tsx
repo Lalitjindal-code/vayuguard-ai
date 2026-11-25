@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { PurifierCalculatorModal } from '../components/PurifierCalculatorModal';
 
 describe('PurifierCalculatorModal Component (src/components/PurifierCalculatorModal.tsx)', () => {
-  it('renders CADR calculator modal when open and computes required CADR', () => {
+  it('renders CADR calculator modal when open and computes required CADR', async () => {
     const handleClose = vi.fn();
     render(<PurifierCalculatorModal isOpen={true} onClose={handleClose} />);
 
@@ -15,10 +15,14 @@ describe('PurifierCalculatorModal Component (src/components/PurifierCalculatorMo
     expect(screen.getByLabelText(/Width \(feet\)/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Ceiling \(feet\)/i)).toBeInTheDocument();
 
-    // Verify Copy Guide button exists and functions
+    // Verify Copy Guide button exists and functions without act() warnings
     const copyButton = screen.getByRole('button', { name: /COPY SPECS|COPIED/i });
     expect(copyButton).toBeInTheDocument();
     fireEvent.click(copyButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /COPIED/i })).toBeInTheDocument();
+    });
 
     // Verify Close button
     const closeBtn = screen.getByLabelText(/Close purifier calculator/i);

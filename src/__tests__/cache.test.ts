@@ -6,7 +6,7 @@ describe('TTL Cache Utility (src/utils/cache.ts)', () => {
   const mockProfile: HouseholdProfile = {
     city: 'Delhi NCR',
     housing: 'apartment',
-    vulnerabilities: ['children', 'asthma' as any],
+    vulnerabilities: ['children', 'respiratory_condition'],
     commute: 'solo_car',
     cookingFuel: 'lpg_with_chimney',
     familySize: 4,
@@ -55,7 +55,7 @@ describe('TTL Cache Utility (src/utils/cache.ts)', () => {
   it('generates deterministic and normalized cache keys', () => {
     const key1 = generateCacheKey(mockProfile, mockTelemetry);
     const key2 = generateCacheKey(
-      { ...mockProfile, vulnerabilities: ['asthma' as any, 'children'] },
+      { ...mockProfile, vulnerabilities: ['respiratory_condition', 'children'] },
       mockTelemetry
     );
     expect(key1).toBe(key2); // Sorted vulnerabilities should produce identical key

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Car, Info } from 'lucide-react';
 import { compareCommuteModes } from '../utils/commuteCalculator';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 
 interface CommuteCompareModalProps {
   isOpen: boolean;
@@ -12,6 +13,8 @@ export const CommuteCompareModal: React.FC<CommuteCompareModalProps> = ({
   onClose,
 }) => {
   const [distanceKm, setDistanceKm] = useState<number>(14);
+
+  useEscapeKey(isOpen, onClose);
 
   if (!isOpen) return null;
 

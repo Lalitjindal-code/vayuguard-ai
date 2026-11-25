@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { X, Wrench, Sparkles, Check, ArrowRight } from 'lucide-react';
 import { calculatePurifierForRoom } from '../utils/purifierCalculator';
+import { copyToClipboard } from '../utils/clipboard';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 
 interface PurifierCalculatorModalProps {
   isOpen: boolean;
@@ -16,6 +18,8 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
   const [height, setHeight] = useState<number>(10);
   const [copiedSteps, setCopiedSteps] = useState<boolean>(false);
 
+  useEscapeKey(isOpen, onClose);
+
   if (!isOpen) return null;
 
   const result = calculatePurifierForRoom(length, width, height);
@@ -28,26 +32,9 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
 5. Operation: Run in a ${result.roomAreaSqFt} sq.ft room for 45 minutes to achieve ${result.achRating} air changes/hr.`;
 
   const handleCopy = async () => {
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(assemblySteps);
-      } else {
-        const textarea = document.createElement('textarea');
-        textarea.value = assemblySteps;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
-      setCopiedSteps(true);
-      setTimeout(() => setCopiedSteps(false), 1500);
-    } catch {
-      // Fallback: indicate copy attempted
-      setCopiedSteps(true);
-      setTimeout(() => setCopiedSteps(false), 1500);
-    }
+    await copyToClipboard(assemblySteps);
+    setCopiedSteps(true);
+    setTimeout(() => setCopiedSteps(false), 1500);
   };
 
   return (

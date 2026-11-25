@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { X, MessageSquare, Copy, Check, ShieldAlert, Users, Car } from 'lucide-react';
 import { AirQualityTelemetry, Language } from '../types/airQuality';
+import { copyToClipboard } from '../utils/clipboard';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 
 interface RwaActionKitModalProps {
   isOpen: boolean;
@@ -17,6 +19,8 @@ export const RwaActionKitModal: React.FC<RwaActionKitModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'whatsapp' | 'guards' | 'carpool'>('whatsapp');
   const [copied, setCopied] = useState<boolean>(false);
+
+  useEscapeKey(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -105,26 +109,9 @@ Please reply with your Block/Flat number and daily route to match with nearby fa
   const currentNotice = notices[activeTab];
 
   const handleCopy = async () => {
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(currentNotice.text);
-      } else {
-        const textarea = document.createElement('textarea');
-        textarea.value = currentNotice.text;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // Fallback: indicate copy attempted
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    }
+    await copyToClipboard(currentNotice.text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   };
 
   return (
