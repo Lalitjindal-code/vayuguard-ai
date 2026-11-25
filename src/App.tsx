@@ -1,14 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import {
-  AirQualityTelemetry,
-  HouseholdProfile,
-  PersonalizedActionPlan,
-  RecommendationCategory,
-  Language,
-} from './types/airQuality';
-import { fetchCityTelemetry, CITY_PRESETS } from './services/aqiService';
-import { generatePersonalizedPlan } from './services/geminiService';
-import { calculateAggregatedImpact } from './utils/impactCalculator';
+import React, { useState } from 'react';
 import { AqiHeader } from './components/AqiHeader';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { ProfileForm } from './components/ProfileForm';
@@ -20,132 +10,35 @@ import { DailyDefenseChecklist } from './components/DailyDefenseChecklist';
 import { PurifierCalculatorModal } from './components/PurifierCalculatorModal';
 import { RwaActionKitModal } from './components/RwaActionKitModal';
 import { CommuteCompareModal } from './components/CommuteCompareModal';
+import { useDashboardState } from './hooks/useDashboardState';
 
 export const App: React.FC = () => {
-  // Language State
-  const [language, setLanguage] = useState<Language>('en');
+  const {
+    language,
+    setLanguage,
+    selectedCity,
+    telemetry,
+    isLoadingTelemetry,
+    profile,
+    setProfile,
+    actionPlan,
+    isLoadingPlan,
+    adoptedIds,
+    activeCategory,
+    setActiveCategory,
+    customApiKey,
+    aggregatedImpact,
+    handleSaveApiKey,
+    handleCityChange,
+    handleGeneratePlan,
+    handleToggleAdopt,
+  } = useDashboardState();
 
-  // Telemetry & City State
-  const [selectedCity, setSelectedCity] = useState<string>('Delhi NCR');
-  const [telemetry, setTelemetry] = useState<AirQualityTelemetry>(CITY_PRESETS[0].telemetry);
-  const [isLoadingTelemetry, setIsLoadingTelemetry] = useState<boolean>(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
-
-  // Household Profile State
-  const [profile, setProfile] = useState<HouseholdProfile>({
-    city: 'Delhi NCR',
-    housing: 'apartment',
-    vulnerabilities: ['children'],
-    commute: 'solo_car',
-    cookingFuel: 'lpg_with_chimney',
-    familySize: 4,
-    customNotes: 'Toddler has morning coughing fits; school starts at 8:00 AM.',
-  });
-
-  // Action Plan & Adoption State
-  const [actionPlan, setActionPlan] = useState<PersonalizedActionPlan | null>(null);
-  const [isLoadingPlan, setIsLoadingPlan] = useState<boolean>(false);
-  const [adoptedIds, setAdoptedIds] = useState<Set<string>>(new Set());
-  const [activeCategory, setActiveCategory] = useState<'all' | RecommendationCategory>('all');
-
-  // Modals State
+  // Modal visibility state
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
   const [isPurifierModalOpen, setIsPurifierModalOpen] = useState<boolean>(false);
   const [isRwaModalOpen, setIsRwaModalOpen] = useState<boolean>(false);
   const [isCommuteModalOpen, setIsCommuteModalOpen] = useState<boolean>(false);
-
-  // API Key (BYOK) State
-  const [customApiKey, setCustomApiKey] = useState<string>(() => {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      return window.sessionStorage.getItem('vayuguard_byok_key') || '';
-    }
-    return '';
-  });
-
-  // Save BYOK Key to memory / sessionStorage
-  const handleSaveApiKey = (key: string) => {
-    setCustomApiKey(key);
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      if (key) {
-        window.sessionStorage.setItem('vayuguard_byok_key', key);
-      } else {
-        window.sessionStorage.removeItem('vayuguard_byok_key');
-      }
-    }
-  };
-
-  // City Telemetry Fetch with AbortController
-  const handleCityChange = async (cityName: string) => {
-    setSelectedCity(cityName);
-    setProfile((prev) => ({ ...prev, city: cityName }));
-
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    setIsLoadingTelemetry(true);
-    try {
-      const data = await fetchCityTelemetry(cityName, controller.signal);
-      setTelemetry(data);
-    } catch (err: unknown) {
-      if ((err as Error)?.name !== 'AbortError') {
-        console.error('Failed to load city telemetry:', err);
-      }
-    } finally {
-      setIsLoadingTelemetry(false);
-    }
-  };
-
-  // Preset Selection
-  const handlePresetSelect = (cityName: string) => {
-    handleCityChange(cityName);
-  };
-
-  // Action Plan Generator
-  const handleGeneratePlan = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setIsLoadingPlan(true);
-
-    try {
-      const plan = await generatePersonalizedPlan(profile, telemetry, customApiKey);
-      setActionPlan(plan);
-      // Pre-adopt top 2 recommendations for instant feedback
-      const initialAdopted = new Set(plan.recommendations.slice(0, 2).map((r) => r.id));
-      setAdoptedIds(initialAdopted);
-    } catch (err) {
-      console.error('Plan generation error:', err);
-    } finally {
-      setIsLoadingPlan(false);
-    }
-  };
-
-  // Initial Plan Generation on Mount — depends only on city to avoid double-fire
-  // when AQI severity changes within the same city after telemetry refresh.
-  useEffect(() => {
-    handleGeneratePlan();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [telemetry.city]);
-
-  // Toggle Action Adoption
-  const handleToggleAdopt = (id: string) => {
-    setAdoptedIds((prev) => {
-      const updated = new Set(prev);
-      if (updated.has(id)) {
-        updated.delete(id);
-      } else {
-        updated.add(id);
-      }
-      return updated;
-    });
-  };
-
-  // Memoized Aggregated Direct Impact Metrics
-  const aggregatedImpact = useMemo(() => {
-    const recs = actionPlan?.recommendations || [];
-    return calculateAggregatedImpact(recs, adoptedIds);
-  }, [actionPlan, adoptedIds]);
 
   return (
     <div className="min-h-screen bg-[#070B10] bg-grid-pattern text-slate-100 flex flex-col font-sans selection:bg-emerald-400 selection:text-slate-950">
@@ -154,7 +47,7 @@ export const App: React.FC = () => {
         telemetry={telemetry}
         selectedCity={selectedCity}
         onCityChange={handleCityChange}
-        onPresetSelect={handlePresetSelect}
+        onPresetSelect={handleCityChange}
         onOpenKeyModal={() => setIsKeyModalOpen(true)}
         onOpenPurifierModal={() => setIsPurifierModalOpen(true)}
         onOpenRwaModal={() => setIsRwaModalOpen(true)}

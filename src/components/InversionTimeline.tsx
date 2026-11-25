@@ -13,6 +13,58 @@ interface InversionTimelineProps {
   hourlyForecast?: HourlyForecastPoint[];
 }
 
+// Estimated atmospheric boundary mixing layer height (meters above ground level)
+// Reflects real winter meteorological diurnal patterns in northern/central India:
+// Night/early morning cooling squashes mixing height to 130-180m;
+// Strong afternoon solar insolation elevates thermal boundary layer up to 1,250m.
+const BOUNDARY_HEIGHTS = [
+  180, 160, 150, 140, 130, 140, 170, 240, 420, 680, 920, 1120, 1220, 1250, 1210, 1080,
+  840, 560, 360, 260, 220, 200, 190, 180,
+] as const;
+
+const SVG_WIDTH = 800;
+const SVG_HEIGHT = 160;
+const PADDING_BOTTOM = 25;
+const PADDING_TOP = 20;
+const USABLE_HEIGHT = SVG_HEIGHT - PADDING_TOP - PADDING_BOTTOM;
+const MIN_METERS = 100;
+const MAX_METERS = 1400;
+
+function getY(meters: number): number {
+  const fraction = (meters - MIN_METERS) / (MAX_METERS - MIN_METERS);
+  return SVG_HEIGHT - PADDING_BOTTOM - fraction * USABLE_HEIGHT;
+}
+
+/** Generates a smooth cubic Bezier spline SVG path across diurnal data points. */
+function getSmoothSpline(pts: { x: number; y: number }[]): string {
+  if (pts.length === 0) return '';
+  let d = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i === 0 ? 0 : i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2 >= pts.length ? pts.length - 1 : i + 2];
+
+    const cp1x = p1.x + (p2.x - p0.x) / 5.5;
+    const cp1y = p1.y + (p2.y - p0.y) / 5.5;
+    const cp2x = p2.x - (p3.x - p1.x) / 5.5;
+    const cp2y = p2.y - (p3.y - p1.y) / 5.5;
+
+    d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+
+const SVG_POINTS = BOUNDARY_HEIGHTS.map((h, i) => ({
+  x: (i / 23) * SVG_WIDTH,
+  y: getY(h),
+  h,
+  hour: i,
+}));
+
+const CURVE_PATH = getSmoothSpline(SVG_POINTS);
+const AREA_PATH = `${CURVE_PATH} L ${SVG_WIDTH},${SVG_HEIGHT - PADDING_BOTTOM} L 0,${SVG_HEIGHT - PADDING_BOTTOM} Z`;
+
 export const InversionTimeline: React.FC<InversionTimelineProps> = ({
   hourlyForecast = [],
 }) => {
@@ -24,64 +76,8 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
 
   const activeIdx = hoveredIdx !== null ? hoveredIdx : selectedHourIdx;
   const currentPoint = hourlyForecast[activeIdx] || hourlyForecast[0];
-
-  // Estimated atmospheric boundary mixing layer height (meters above ground level)
-  // Reflects real winter meteorological diurnal patterns in northern/central India:
-  // Night/early morning cooling squashes mixing height to 130-180m;
-  // Strong afternoon solar insolation elevates thermal boundary layer up to 1,200m-1,250m.
-  const boundaryHeights = [
-    180, 160, 150, 140, 130, 140, 170, 240, 420, 680, 920, 1120, 1220, 1250, 1210, 1080,
-    840, 560, 360, 260, 220, 200, 190, 180,
-  ];
-
-  const currentHeight = boundaryHeights[activeIdx] || 500;
-
-  // SVG dimensions
-  const svgWidth = 800;
-  const svgHeight = 160;
-  const paddingBottom = 25;
-  const paddingTop = 20;
-  const usableHeight = svgHeight - paddingTop - paddingBottom;
-
-  // Map 100m to 1400m onto Y coordinates
-  const minMeters = 100;
-  const maxMeters = 1400;
-
-  const getY = (meters: number) => {
-    const fraction = (meters - minMeters) / (maxMeters - minMeters);
-    return svgHeight - paddingBottom - fraction * usableHeight;
-  };
-
-  const svgPoints = boundaryHeights.map((h, i) => {
-    const x = (i / 23) * svgWidth;
-    const y = getY(h);
-    return { x, y, h, hour: i };
-  });
-
-  // Generate silky-smooth cubic Bezier spline
-  const getSmoothSpline = (pts: { x: number; y: number }[]): string => {
-    if (pts.length === 0) return '';
-    let d = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p0 = pts[i === 0 ? 0 : i - 1];
-      const p1 = pts[i];
-      const p2 = pts[i + 1];
-      const p3 = pts[i + 2 >= pts.length ? pts.length - 1 : i + 2];
-
-      const cp1x = p1.x + (p2.x - p0.x) / 5.5;
-      const cp1y = p1.y + (p2.y - p0.y) / 5.5;
-      const cp2x = p2.x - (p3.x - p1.x) / 5.5;
-      const cp2y = p2.y - (p3.y - p1.y) / 5.5;
-
-      d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
-    }
-    return d;
-  };
-
-  const curvePath = getSmoothSpline(svgPoints);
-  const areaPath = `${curvePath} L ${svgWidth},${svgHeight - paddingBottom} L 0,${svgHeight - paddingBottom} Z`;
-
-  const activePoint = svgPoints[activeIdx] || svgPoints[0];
+  const currentHeight = BOUNDARY_HEIGHTS[activeIdx] || 500;
+  const activePoint = SVG_POINTS[activeIdx] || SVG_POINTS[0];
 
   // Interactive scrubber pointer handler
   const handlePointer = (clientX: number) => {
@@ -205,7 +201,7 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
         >
           <svg
             className="w-full h-full"
-            viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+            viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
             preserveAspectRatio="none"
             aria-hidden="true"
           >
@@ -238,7 +234,7 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
             <line
               x1="0"
               y1={getY(1200)}
-              x2={svgWidth}
+              x2={SVG_WIDTH}
               y2={getY(1200)}
               stroke="#10B981"
               strokeDasharray="4 4"
@@ -253,7 +249,7 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
             <line
               x1="0"
               y1={getY(800)}
-              x2={svgWidth}
+              x2={SVG_WIDTH}
               y2={getY(800)}
               stroke="#06B6D4"
               strokeDasharray="4 4"
@@ -268,7 +264,7 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
             <line
               x1="0"
               y1={getY(200)}
-              x2={svgWidth}
+              x2={SVG_WIDTH}
               y2={getY(200)}
               stroke="#EF4444"
               strokeDasharray="4 4"
@@ -280,11 +276,11 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
             </text>
 
             {/* Filled Smooth Area Curve */}
-            <path d={areaPath} fill="url(#splineAreaGradient)" />
+            <path d={AREA_PATH} fill="url(#splineAreaGradient)" />
 
             {/* Glowing Neon Wave Line */}
             <path
-              d={curvePath}
+              d={CURVE_PATH}
               fill="none"
               stroke="#22D3EE"
               strokeWidth="3"
@@ -296,7 +292,7 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
               x1={activePoint.x}
               y1="0"
               x2={activePoint.x}
-              y2={svgHeight - paddingBottom}
+              y2={SVG_HEIGHT - PADDING_BOTTOM}
               stroke="#FFFFFF"
               strokeWidth="2"
               strokeDasharray="3 3"
@@ -325,13 +321,13 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
             />
 
             {/* Hour Ticks on X-Axis Bottom */}
-            {svgPoints
+            {SVG_POINTS
               .filter((_, idx) => idx % 2 === 0)
               .map((pt, i) => (
                 <text
                   key={i}
                   x={pt.x}
-                  y={svgHeight - 8}
+                  y={SVG_HEIGHT - 8}
                   fill="#94A3B8"
                   fontSize="9"
                   fontFamily="JetBrains Mono"
@@ -373,7 +369,7 @@ export const InversionTimeline: React.FC<InversionTimelineProps> = ({
                     ? 'ring-2 ring-white scale-110 z-10 brutal-shadow'
                     : 'opacity-85 hover:opacity-100 hover:scale-105'
                 }`}
-                title={`${pt.time}: AQI ${pt.aqi} (Inversion: ${pt.inversionRisk}, Mixing Height: ${boundaryHeights[idx]}m)`}
+                title={`${pt.time}: AQI ${pt.aqi} (Inversion: ${pt.inversionRisk}, Mixing Height: ${BOUNDARY_HEIGHTS[idx]}m)`}
                 aria-pressed={isSelected}
               >
                 <span>{pt.hour}</span>

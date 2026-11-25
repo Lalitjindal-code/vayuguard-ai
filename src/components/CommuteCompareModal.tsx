@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Car, Info } from 'lucide-react';
+import { Car, Info } from 'lucide-react';
 import { compareCommuteModes } from '../utils/commuteCalculator';
-import { useEscapeKey } from '../hooks/useEscapeKey';
+import { ModalShell } from './ModalShell';
 
 interface CommuteCompareModalProps {
   isOpen: boolean;
@@ -14,43 +14,20 @@ export const CommuteCompareModal: React.FC<CommuteCompareModalProps> = ({
 }) => {
   const [distanceKm, setDistanceKm] = useState<number>(14);
 
-  useEscapeKey(isOpen, onClose);
-
-  if (!isOpen) return null;
-
   const comparison = compareCommuteModes(distanceKm);
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="commute-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
+    <ModalShell
+      isOpen={isOpen}
+      onClose={onClose}
+      titleId="commute-modal-title"
+      title="Head-to-Head Commute Exposure & Emission Evaluator"
+      subtitle="Personal respiratory risk vs vehicular carbon footprint across urban transit options"
+      icon={<Car className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />}
+      iconWrapperClassName="bg-cyan-500/10 border-2 border-cyan-400 text-cyan-400"
+      closeAriaLabel="Close commute comparison"
+      maxWidthClassName="max-w-3xl"
     >
-      <div className="w-full max-w-3xl bg-[#0C121B] border-2 border-slate-700 rounded-xl brutal-shadow p-6 relative my-8">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
-          aria-label="Close commute comparison"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border-2 border-cyan-400 flex items-center justify-center text-cyan-400 brutal-shadow-sm font-bold">
-            <Car className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />
-          </div>
-          <div>
-            <h2 id="commute-modal-title" className="text-base font-black uppercase tracking-wide text-white font-display">
-              Head-to-Head Commute Exposure & Emission Evaluator
-            </h2>
-            <p className="text-xs text-slate-400 font-mono">
-              Personal respiratory risk vs vehicular carbon footprint across urban transit options
-            </p>
-          </div>
-        </div>
 
         {/* Distance Slider */}
         <div className="p-4 rounded-xl bg-[#111824] border-2 border-slate-800 mb-5 space-y-2 brutal-shadow-sm font-mono">
@@ -143,7 +120,6 @@ export const CommuteCompareModal: React.FC<CommuteCompareModalProps> = ({
             );
           })}
         </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 };

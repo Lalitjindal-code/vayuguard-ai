@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Key, Shield, CheckCircle, ExternalLink, Eye, EyeOff } from 'lucide-react';
-import { useEscapeKey } from '../hooks/useEscapeKey';
+import { Key, Shield, CheckCircle, ExternalLink, Eye, EyeOff } from 'lucide-react';
+import { ModalShell } from './ModalShell';
 
 interface ApiKeyModalProps {
   isOpen: boolean;
@@ -34,10 +34,6 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
     };
   }, [isOpen, currentKey]);
 
-  useEscapeKey(isOpen, onClose);
-
-  if (!isOpen) return null;
-
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     onSaveKey(inputKey.trim());
@@ -56,35 +52,18 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
   const isLikelyValidFormat = !inputKey.trim() || inputKey.trim().startsWith('AIza');
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="api-key-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+    <ModalShell
+      isOpen={isOpen}
+      onClose={onClose}
+      titleId="api-key-modal-title"
+      title="Gemini API Key (BYOK)"
+      subtitle="Optional session-only configuration"
+      icon={<Key className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />}
+      iconWrapperClassName="bg-emerald-500/10 border-2 border-emerald-400 text-emerald-400"
+      closeAriaLabel="Close dialog"
+      maxWidthClassName="max-w-md"
     >
-      <div className="w-full max-w-md bg-[#0C121B] border-2 border-slate-700 rounded-xl brutal-shadow p-6 relative">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
-          aria-label="Close dialog"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 brutal-shadow-sm font-bold">
-            <Key className="w-5 h-5 stroke-[2.5]" />
-          </div>
-          <div>
-            <h2 id="api-key-modal-title" className="text-base font-black uppercase tracking-wide text-white font-display">
-              Gemini API Key (BYOK)
-            </h2>
-            <p className="text-xs text-slate-400 font-mono">Optional session-only configuration</p>
-          </div>
-        </div>
-
-        <form onSubmit={handleSave} className="space-y-4">
+      <form onSubmit={handleSave} className="space-y-4">
           <div>
             <label htmlFor="gemini-key-input" className="block text-xs font-bold uppercase tracking-wider text-slate-200 mb-1.5 font-mono">
               Google Gemini API Key
@@ -168,7 +147,6 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
             </div>
           </div>
         </form>
-      </div>
-    </div>
+    </ModalShell>
   );
 };

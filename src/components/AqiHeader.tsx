@@ -126,7 +126,7 @@ export const AqiHeader: React.FC<AqiHeaderProps> = ({
   return (
     <header
       ref={headerRef}
-      className="border-b-2 border-slate-700 bg-[#080D14]/98 backdrop-blur sticky top-0 z-40 brutal-shadow py-2.5 space-y-2.5 transition-none"
+      className="border-b-2 border-slate-700 bg-[#080D14]/95 backdrop-blur sticky top-0 z-40 brutal-shadow py-2.5 space-y-2.5 transition-none"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-2.5">
         {/* ROW 1: Brand Identity, Live Severity Badge, Quick Tools & Language */}

@@ -6,7 +6,7 @@
 [![Google Gemini](https://img.shields.io/badge/Google%20GenAI-Gemini%202.5%20Flash-4285F4?logo=google&logoColor=white)](#)
 [![CPCB NAQI](https://img.shields.io/badge/Standard-Indian%20CPCB%20NAQI-10B981)](#)
 [![WCAG 2.1 AA](https://img.shields.io/badge/Accessibility-WCAG%202.1%20AA-10B981)](#)
-[![Tests Passing](https://img.shields.io/badge/Tests-49%20Passed%20(Vitest)-22C55E)](#)
+[![Tests Passing](https://img.shields.io/badge/Tests-51%20Passed%20(Vitest)-22C55E)](#)
 
 > **PromptWars Challenge 6 Entry**  
 > *"Create a GenAI-powered assistant that helps families and communities navigate severe winter smog and urban air pollution. The application should suggest low-emission daily routines, indoor air quality hacks, and sustainable alternatives tailored to their location and lifestyle, while clearly explaining the direct impact of their choices."*
@@ -64,7 +64,7 @@ Every recommendation quantifies personal respiratory exposure reduction, weekly 
 
 ```text
 src/
-├── __tests__/               # 14 Vitest + React Testing Library suites (49 passing tests)
+├── __tests__/               # 15 Vitest + React Testing Library suites (51 passing tests)
 ├── components/
 │   ├── ActionPlanGrid.tsx   # Categorized recommendations, micro-tags, WhatsApp sharing
 │   ├── ApiKeyModal.tsx      # BYOK Gemini key modal with mask toggle & zero-localStorage policy
@@ -74,12 +74,16 @@ src/
 │   ├── ErrorBoundary.tsx    # Top-level React error boundary with recovery UI
 │   ├── ImpactVisualizer.tsx # Diminishing-returns KPIs, cigarette meter, community multiplier
 │   ├── InversionTimeline.tsx# Interactive SVG spline + WCAG slider scrubber
+│   ├── ModalShell.tsx       # Shared accessible dialog shell (backdrop + Escape dismissal)
 │   ├── NeoSelect.tsx        # Custom Neo-Brutalist accessible dropdown
 │   ├── ProfileForm.tsx      # Household context & vulnerability profiler
 │   ├── PurifierCalculatorModal.tsx
 │   ├── RwaActionKitModal.tsx
 │   └── SmogChatCopilot.tsx  # Full-width grounded conversational assistant
+├── data/
+│   └── cityPresets.ts       # Localized city benchmark presets
 ├── hooks/
+│   ├── useDashboardState.ts # Centralized telemetry, plan, adoption & BYOK state hook
 │   └── useEscapeKey.ts      # Shared Escape-key dialog dismissal hook
 ├── services/
 │   ├── aqiService.ts        # Open-Meteo integration & official CPCB NAQI formulas
@@ -122,7 +126,7 @@ npm run dev
 # 4. Run TypeScript strict typecheck
 npm run typecheck
 
-# 5. Run automated test suite (49 passing tests across 14 files)
+# 5. Run automated test suite (51 passing tests across 15 files)
 npm test
 
 # 6. Build production bundle (with manual chunk splitting)

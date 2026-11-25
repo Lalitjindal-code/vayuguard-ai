@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { X, Wrench, Sparkles, Check, ArrowRight } from 'lucide-react';
+import { Wrench, Sparkles, Check, ArrowRight } from 'lucide-react';
 import { calculatePurifierForRoom } from '../utils/purifierCalculator';
 import { copyToClipboard } from '../utils/clipboard';
-import { useEscapeKey } from '../hooks/useEscapeKey';
+import { ModalShell } from './ModalShell';
 
 interface PurifierCalculatorModalProps {
   isOpen: boolean;
@@ -17,10 +17,6 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
   const [width, setWidth] = useState<number>(14);
   const [height, setHeight] = useState<number>(10);
   const [copiedSteps, setCopiedSteps] = useState<boolean>(false);
-
-  useEscapeKey(isOpen, onClose);
-
-  if (!isOpen) return null;
 
   const result = calculatePurifierForRoom(length, width, height);
 
@@ -38,36 +34,17 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="purifier-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
+    <ModalShell
+      isOpen={isOpen}
+      onClose={onClose}
+      titleId="purifier-modal-title"
+      title="DIY Box-Fan & HEPA Purifier CADR Calculator"
+      subtitle="Corsi-Rosenthal clean air calculations tailored to your room volume"
+      icon={<Wrench className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />}
+      iconWrapperClassName="bg-cyan-500/10 border-2 border-cyan-400 text-cyan-400"
+      closeAriaLabel="Close purifier calculator"
+      maxWidthClassName="max-w-2xl"
     >
-      <div className="w-full max-w-2xl bg-[#0C121B] border-2 border-slate-700 rounded-xl brutal-shadow p-6 relative my-8">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
-          aria-label="Close purifier calculator"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border-2 border-cyan-400 flex items-center justify-center text-cyan-400 brutal-shadow-sm font-bold">
-            <Wrench className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />
-          </div>
-          <div>
-            <h2 id="purifier-modal-title" className="text-base font-black uppercase tracking-wide text-white font-display">
-              DIY Box-Fan & HEPA Purifier CADR Calculator
-            </h2>
-            <p className="text-xs text-slate-400 font-mono">
-              Corsi-Rosenthal clean air calculations tailored to your room volume
-            </p>
-          </div>
-        </div>
 
         {/* Room Dimension Inputs */}
         <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-[#111824] border-2 border-slate-800 mb-5">
@@ -187,7 +164,6 @@ export const PurifierCalculatorModal: React.FC<PurifierCalculatorModalProps> = (
             <li>Run on medium speed in a closed room for 45 minutes to cut indoor PM2.5 by ~55%.</li>
           </ol>
         </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 };

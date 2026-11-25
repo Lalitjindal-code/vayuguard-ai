@@ -11,30 +11,15 @@ import {
   ActionRecommendation,
 } from '../types/airQuality';
 
-/**
- * Generates a tailored 6-to-8 item action plan strictly covering all 3 required pillars:
- * 1. low-emission routines
- * 2. indoor air quality hacks
- * 3. sustainable alternatives
- * plus direct impact explanations for every recommendation.
- */
-export function generateDeterministicPlan(
+function buildRoutineRecommendations(
   profile: HouseholdProfile,
   telemetry: AirQualityTelemetry
-): PersonalizedActionPlan {
+): ActionRecommendation[] {
   const recommendations: ActionRecommendation[] = [];
   const isHighSmog = telemetry.severity === 'Severe' || telemetry.severity === 'Poor';
   const hasChildren = profile.vulnerabilities.includes('children');
-  const hasElderly = profile.vulnerabilities.includes('elderly');
   const hasAsthma = profile.vulnerabilities.includes('respiratory_condition');
-  const isRoadside = profile.housing === 'roadside_home';
-  const isApartment = profile.housing === 'apartment';
 
-  // -------------------------------------------------------------
-  // PILLAR 1: Low-Emission Daily Routines
-  // -------------------------------------------------------------
-
-  // Routine 1: Outdoor Timing & Thermal Inversion Shift
   if (isHighSmog) {
     recommendations.push({
       id: 'routine-inversion-shift',
@@ -69,7 +54,6 @@ export function generateDeterministicPlan(
     });
   }
 
-  // Routine 2: Dust Suppression Cleaning (Wet Mopping vs Dry Broom)
   recommendations.push({
     id: 'routine-wet-mop-protocol',
     category: 'routine',
@@ -87,7 +71,6 @@ export function generateDeterministicPlan(
     },
   });
 
-  // Routine 3: Smart Errand Batching & Cold-Start Reduction
   if (profile.commute === 'solo_car' || profile.commute === 'two_wheeler') {
     recommendations.push({
       id: 'routine-trip-chaining',
@@ -96,175 +79,202 @@ export function generateDeterministicPlan(
       description:
         'Catalytic converters and two-wheeler engines emit 60% of their trip emissions during the first 5 minutes of a cold start. Batch grocery, pharmacy, and school errands into a single continuous loop rather than 3 separate cold trips.',
       timeframe: 'Weekly planning',
-    estimatedCostInr: 0,
-    impact: {
-      pm25ReductionPercent: 15,
-      weeklyCo2SavedKg: 5.8,
-      monthlySavingsInr: 720,
-      directExplanation:
-        'Running an engine at optimal operating temperature prevents incomplete hydrocarbon combustion, keeping neighborhood street-level tailpipe soot and greenhouse gases down.',
-    },
-  });
-  }
-
-  // -------------------------------------------------------------
-  // PILLAR 2: Indoor Air Quality (IAQ) Hacks
-  // -------------------------------------------------------------
-
-  // IAQ 1: Diurnal Ventilation Window
-  recommendations.push({
-    id: 'iaq-ventilation-timing',
-    category: 'indoor_hack',
-    title: `Precision Solar Ventilation (${telemetry.safeVentilationWindow})`,
-    description: isRoadside
-      ? 'Your roadside location suffers heavy traffic exhaust. Open only rear or inner courtyard windows strictly for 30 minutes during peak sun, keeping street-facing apertures sealed.'
-      : isApartment
-      ? `Open north/east balcony doors for a cross-ventilation burst strictly between ${telemetry.safeVentilationWindow} to flush indoor carbon dioxide and humidity without admitting nocturnal particulate smog.`
-      : `Perform a 30-minute cross-ventilation flush during ${telemetry.safeVentilationWindow}, then latch all doors and windows with draft sweeps.`,
-    timeframe: 'Daily during safe window',
-    estimatedCostInr: 0,
-    impact: {
-      pm25ReductionPercent: 28,
-      weeklyCo2SavedKg: 0.5,
-      monthlySavingsInr: 0,
-      directExplanation:
-        'Flushes metabolic CO2 and indoor volatile compounds while preventing external particulate ingress that occurs when windows are mistakenly opened during morning thermal traps.',
-    },
-  });
-
-  // IAQ 2: DIY Box-Fan Air Purifier or Wet Towel Sealing
-  recommendations.push({
-    id: 'iaq-diy-filter-setup',
-    category: 'indoor_hack',
-    title: 'DIY High-Efficiency MERV-13 / Box-Fan Purifier Assembly',
-    description:
-      'Tape a standard 16x16" MERV-13 / HEPA furnace filter (approx. ₹750) to the intake side of an ordinary domestic box fan. Place in the main bedroom away from curtains.',
-    timeframe: '30-minute one-time build',
-    estimatedCostInr: 850,
-    impact: {
-      pm25ReductionPercent: 48,
-      weeklyCo2SavedKg: 0.8,
-      monthlySavingsInr: 1200,
-      directExplanation:
-        'Provides Clean Air Delivery Rate (CADR) equivalent to a ₹12,000 commercial purifier, pulling 0.3-micron PM2.5 and allergen particles out of enclosed sleeping quarters.',
-    },
-  });
-
-  // IAQ 3: Cooking Fuel & Exhaust Protocol
-  if (profile.cookingFuel === 'lpg_no_exhaust' || profile.cookingFuel === 'biomass_coal') {
-    recommendations.push({
-      id: 'iaq-exhaust-splashguard',
-      category: 'indoor_hack',
-      title: 'Dedicated Kitchen Exhaust & Thermal Lid Partitioning',
-      description:
-        'Unvented cooking produces toxic nitrogen dioxide (NO2) and ultrafine oil droplets. Install a localized through-window exhaust fan (₹650) and always cook with tight-fitting lids on high-temperature mustard/ghee tadkas.',
-      timeframe: 'Immediate setup',
-      estimatedCostInr: 650,
+      estimatedCostInr: 0,
       impact: {
-        pm25ReductionPercent: 42,
-        weeklyCo2SavedKg: 1.4,
-        monthlySavingsInr: 300,
+        pm25ReductionPercent: 15,
+        weeklyCo2SavedKg: 5.8,
+        monthlySavingsInr: 720,
         directExplanation:
-          'Eliminates primary indoor combustion aerosols at the burner before they diffuse into children’s and elderly sleeping quarters.',
+          'Running an engine at optimal operating temperature prevents incomplete hydrocarbon combustion, keeping neighborhood street-level tailpipe soot and greenhouse gases down.',
       },
     });
-  } else {
-    recommendations.push({
-      id: 'iaq-phyto-remediation',
+  }
+
+  return recommendations;
+}
+
+function buildIndoorHackRecommendations(
+  profile: HouseholdProfile,
+  telemetry: AirQualityTelemetry
+): ActionRecommendation[] {
+  const isRoadside = profile.housing === 'roadside_home';
+  const isApartment = profile.housing === 'apartment';
+
+  const ventilationDescription = isRoadside
+    ? 'Your roadside location suffers heavy traffic exhaust. Open only rear or inner courtyard windows strictly for 30 minutes during peak sun, keeping street-facing apertures sealed.'
+    : isApartment
+    ? `Open north/east balcony doors for a cross-ventilation burst strictly between ${telemetry.safeVentilationWindow} to flush indoor carbon dioxide and humidity without admitting nocturnal particulate smog.`
+    : `Perform a 30-minute cross-ventilation flush during ${telemetry.safeVentilationWindow}, then latch all doors and windows with draft sweeps.`;
+
+  const cookingHack: ActionRecommendation =
+    profile.cookingFuel === 'lpg_no_exhaust' || profile.cookingFuel === 'biomass_coal'
+      ? {
+          id: 'iaq-exhaust-splashguard',
+          category: 'indoor_hack',
+          title: 'Dedicated Kitchen Exhaust & Thermal Lid Partitioning',
+          description:
+            'Unvented cooking produces toxic nitrogen dioxide (NO2) and ultrafine oil droplets. Install a localized through-window exhaust fan (₹650) and always cook with tight-fitting lids on high-temperature mustard/ghee tadkas.',
+          timeframe: 'Immediate setup',
+          estimatedCostInr: 650,
+          impact: {
+            pm25ReductionPercent: 42,
+            weeklyCo2SavedKg: 1.4,
+            monthlySavingsInr: 300,
+            directExplanation:
+              'Eliminates primary indoor combustion aerosols at the burner before they diffuse into children’s and elderly sleeping quarters.',
+          },
+        }
+      : {
+          id: 'iaq-phyto-remediation',
+          category: 'indoor_hack',
+          title: 'Active Phytoremediation (Snake Plant & Areca Palm Placement)',
+          description:
+            'Place 2 Snake Plants (Sansevieria trifasciata) in bedrooms (they release oxygen and absorb nighttime CO2 via CAM photosynthesis) and 2 Areca Palms in the living area for daytime VOC transpirational filtration.',
+          timeframe: 'Permanent household upgrade',
+          estimatedCostInr: 500,
+          impact: {
+            pm25ReductionPercent: 12,
+            weeklyCo2SavedKg: 0.4,
+            monthlySavingsInr: 0,
+            directExplanation:
+              'Naturally humidifies dry winter indoor air and bio-filters airborne toluene, xylene, and formaldehyde off-gassing from furniture and paints.',
+          },
+        };
+
+  return [
+    {
+      id: 'iaq-ventilation-timing',
       category: 'indoor_hack',
-      title: 'Active Phytoremediation (Snake Plant & Areca Palm Placement)',
-      description:
-        'Place 2 Snake Plants (Sansevieria trifasciata) in bedrooms (they release oxygen and absorb nighttime CO2 via CAM photosynthesis) and 2 Areca Palms in the living area for daytime VOC transpirational filtration.',
-      timeframe: 'Permanent household upgrade',
-      estimatedCostInr: 500,
+      title: `Precision Solar Ventilation (${telemetry.safeVentilationWindow})`,
+      description: ventilationDescription,
+      timeframe: 'Daily during safe window',
+      estimatedCostInr: 0,
       impact: {
-        pm25ReductionPercent: 12,
-        weeklyCo2SavedKg: 0.4,
+        pm25ReductionPercent: 28,
+        weeklyCo2SavedKg: 0.5,
         monthlySavingsInr: 0,
         directExplanation:
-          'Naturally humidifies dry winter indoor air and bio-filters airborne toluene, xylene, and formaldehyde off-gassing from furniture and paints.',
+          'Flushes metabolic CO2 and indoor volatile compounds while preventing external particulate ingress that occurs when windows are mistakenly opened during morning thermal traps.',
       },
-    });
-  }
-
-  // -------------------------------------------------------------
-  // PILLAR 3: Sustainable Alternatives
-  // -------------------------------------------------------------
-
-  // Sustainable Swap 1: Commute Alternative
-  if (profile.commute === 'solo_car') {
-    recommendations.push({
-      id: 'swap-transit-carpool',
-      category: 'sustainable_alternative',
-      title: 'Shared Metro Transit + E-Rickshaw Last-Mile Hub',
-      description:
-        'Swap 3 solo car commute days per week with city metro transit paired with shared electric rickshaws for first/last-mile connections.',
-      timeframe: '3 days per week',
-      estimatedCostInr: 0,
-      impact: {
-        pm25ReductionPercent: 22,
-        weeklyCo2SavedKg: 16.5,
-        monthlySavingsInr: 2800,
-        directExplanation:
-          'Directly prevents 16.5 kg of fossil CO2 emissions weekly while sparing your lungs from toxic idling exhaust in stagnant traffic jams.',
-      },
-    });
-  } else if (profile.commute === 'two_wheeler') {
-    recommendations.push({
-      id: 'swap-n95-transit-hybrid',
-      category: 'sustainable_alternative',
-      title: 'Certified N95 Anti-Pollution Mask + Electric Transit Hybrid',
-      description:
-        'Two-wheeler riders inhale 4x more road-level particulate matter than enclosed motorists. Wear a well-fitted reusable valve-less N95 mask and transition short local rides to neighborhood EV shared shuttles.',
-      timeframe: 'Daily during peak winter',
-      estimatedCostInr: 200,
-      impact: {
-        pm25ReductionPercent: 65,
-        weeklyCo2SavedKg: 4.2,
-        monthlySavingsInr: 600,
-        directExplanation:
-          'Mechanically blocks 95% of toxic roadside soot, tire abrasion particles, and heavy metals from entering your bronchioles during open rides.',
-      },
-    });
-  } else {
-    recommendations.push({
-      id: 'swap-ev-carpool-initiative',
-      category: 'sustainable_alternative',
-      title: 'Community EV Carpool & Zero-Emission Neighborhood Delivery',
-      description:
-        'Organize neighborhood grocery bulk-ordering to eliminate redundant delivery vans, and coordinate EV carpools for community office clusters.',
-      timeframe: 'Weekly community action',
-      estimatedCostInr: 0,
-      impact: {
-        pm25ReductionPercent: 18,
-        weeklyCo2SavedKg: 8.4,
-        monthlySavingsInr: 950,
-        directExplanation:
-          'Consolidates freight vehicle miles traveled in residential colonies, eliminating diesel idling in front of ground-floor homes.',
-      },
-    });
-  }
-
-  // Sustainable Swap 2: Clean Winter Heating / Bio-Waste Composting
-  recommendations.push({
-    id: 'swap-clean-heating-compost',
-    category: 'sustainable_alternative',
-    title: 'Oil-Filled Radiators + Brown Garden Leaf Composting',
-    description:
-      'Replace open wire coil heaters or wood/waste fires with an efficient sealed oil-filled radiator. In your garden or society compound, mulch dry fallen leaves into compost bins instead of burning them.',
-    timeframe: 'Winter season protocol',
-    estimatedCostInr: 0,
-    impact: {
-      pm25ReductionPercent: 35,
-      weeklyCo2SavedKg: 9.8,
-      monthlySavingsInr: 400,
-      directExplanation:
-        'Halts neighborhood open biomass combustion—the single largest source of carcinogenic black carbon and dioxins trapped during winter ground inversions.',
     },
-  });
+    {
+      id: 'iaq-diy-filter-setup',
+      category: 'indoor_hack',
+      title: 'DIY High-Efficiency MERV-13 / Box-Fan Purifier Assembly',
+      description:
+        'Tape a standard 16x16" MERV-13 / HEPA furnace filter (approx. ₹750) to the intake side of an ordinary domestic box fan. Place in the main bedroom away from curtains.',
+      timeframe: '30-minute one-time build',
+      estimatedCostInr: 850,
+      impact: {
+        pm25ReductionPercent: 48,
+        weeklyCo2SavedKg: 0.8,
+        monthlySavingsInr: 1200,
+        directExplanation:
+          'Provides Clean Air Delivery Rate (CADR) equivalent to a ₹12,000 commercial purifier, pulling 0.3-micron PM2.5 and allergen particles out of enclosed sleeping quarters.',
+      },
+    },
+    cookingHack,
+  ];
+}
+
+function buildSustainableSwaps(profile: HouseholdProfile): ActionRecommendation[] {
+  const commuteSwap: ActionRecommendation =
+    profile.commute === 'solo_car'
+      ? {
+          id: 'swap-transit-carpool',
+          category: 'sustainable_alternative',
+          title: 'Shared Metro Transit + E-Rickshaw Last-Mile Hub',
+          description:
+            'Swap 3 solo car commute days per week with city metro transit paired with shared electric rickshaws for first/last-mile connections.',
+          timeframe: '3 days per week',
+          estimatedCostInr: 0,
+          impact: {
+            pm25ReductionPercent: 22,
+            weeklyCo2SavedKg: 16.5,
+            monthlySavingsInr: 2800,
+            directExplanation:
+              'Directly prevents 16.5 kg of fossil CO2 emissions weekly while sparing your lungs from toxic idling exhaust in stagnant traffic jams.',
+          },
+        }
+      : profile.commute === 'two_wheeler'
+      ? {
+          id: 'swap-n95-transit-hybrid',
+          category: 'sustainable_alternative',
+          title: 'Certified N95 Anti-Pollution Mask + Electric Transit Hybrid',
+          description:
+            'Two-wheeler riders inhale 4x more road-level particulate matter than enclosed motorists. Wear a well-fitted reusable valve-less N95 mask and transition short local rides to neighborhood EV shared shuttles.',
+          timeframe: 'Daily during peak winter',
+          estimatedCostInr: 200,
+          impact: {
+            pm25ReductionPercent: 65,
+            weeklyCo2SavedKg: 4.2,
+            monthlySavingsInr: 600,
+            directExplanation:
+              'Mechanically blocks 95% of toxic roadside soot, tire abrasion particles, and heavy metals from entering your bronchioles during open rides.',
+          },
+        }
+      : {
+          id: 'swap-ev-carpool-initiative',
+          category: 'sustainable_alternative',
+          title: 'Community EV Carpool & Zero-Emission Neighborhood Delivery',
+          description:
+            'Organize neighborhood grocery bulk-ordering to eliminate redundant delivery vans, and coordinate EV carpools for community office clusters.',
+          timeframe: 'Weekly community action',
+          estimatedCostInr: 0,
+          impact: {
+            pm25ReductionPercent: 18,
+            weeklyCo2SavedKg: 8.4,
+            monthlySavingsInr: 950,
+            directExplanation:
+              'Consolidates freight vehicle miles traveled in residential colonies, eliminating diesel idling in front of ground-floor homes.',
+          },
+        };
+
+  return [
+    commuteSwap,
+    {
+      id: 'swap-clean-heating-compost',
+      category: 'sustainable_alternative',
+      title: 'Oil-Filled Radiators + Brown Garden Leaf Composting',
+      description:
+        'Replace open wire coil heaters or wood/waste fires with an efficient sealed oil-filled radiator. In your garden or society compound, mulch dry fallen leaves into compost bins instead of burning them.',
+      timeframe: 'Winter season protocol',
+      estimatedCostInr: 0,
+      impact: {
+        pm25ReductionPercent: 35,
+        weeklyCo2SavedKg: 9.8,
+        monthlySavingsInr: 400,
+        directExplanation:
+          'Halts neighborhood open biomass combustion—the single largest source of carcinogenic black carbon and dioxins trapped during winter ground inversions.',
+      },
+    },
+  ];
+}
+
+/**
+ * Generates a tailored 6-to-8 item action plan strictly covering all 3 required pillars:
+ * 1. low-emission routines
+ * 2. indoor air quality hacks
+ * 3. sustainable alternatives
+ * plus direct impact explanations for every recommendation.
+ */
+export function generateDeterministicPlan(
+  profile: HouseholdProfile,
+  telemetry: AirQualityTelemetry
+): PersonalizedActionPlan {
+  const hasVulnerableGroup =
+    profile.vulnerabilities.includes('children') ||
+    profile.vulnerabilities.includes('elderly') ||
+    profile.vulnerabilities.includes('respiratory_condition');
+
+  const recommendations: ActionRecommendation[] = [
+    ...buildRoutineRecommendations(profile, telemetry),
+    ...buildIndoorHackRecommendations(profile, telemetry),
+    ...buildSustainableSwaps(profile),
+  ];
 
   const summary = `Personalized winter smog action plan for ${profile.city} (${telemetry.severity} AQI ${telemetry.aqi}). Prioritizing ${
-    hasChildren || hasElderly || hasAsthma ? 'vulnerable respiratory defense' : 'active exposure avoidance'
+    hasVulnerableGroup ? 'vulnerable respiratory defense' : 'active exposure avoidance'
   }, indoor barrier engineering, and high-impact sustainable swaps.`;
 
   const winterSmogAdvisory = `Inversion Advisory: Low surface wind speeds and cold night air trap PM2.5 below 200 meters. Maintain sealed indoor environments between 6:30 PM and 10:00 AM, and utilize the safe midday ventilation window (${telemetry.safeVentilationWindow}).`;

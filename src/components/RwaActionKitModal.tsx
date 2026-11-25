@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { X, MessageSquare, Copy, Check, ShieldAlert, Users, Car } from 'lucide-react';
+import { MessageSquare, Copy, Check, ShieldAlert, Users, Car } from 'lucide-react';
 import { AirQualityTelemetry, Language } from '../types/airQuality';
 import { copyToClipboard } from '../utils/clipboard';
-import { useEscapeKey } from '../hooks/useEscapeKey';
+import { ModalShell } from './ModalShell';
 
 interface RwaActionKitModalProps {
   isOpen: boolean;
@@ -19,10 +19,6 @@ export const RwaActionKitModal: React.FC<RwaActionKitModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'whatsapp' | 'guards' | 'carpool'>('whatsapp');
   const [copied, setCopied] = useState<boolean>(false);
-
-  useEscapeKey(isOpen, onClose);
-
-  if (!isOpen) return null;
 
   const notices = {
     whatsapp: {
@@ -115,36 +111,17 @@ Please reply with your Block/Flat number and daily route to match with nearby fa
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="rwa-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
+    <ModalShell
+      isOpen={isOpen}
+      onClose={onClose}
+      titleId="rwa-modal-title"
+      title="Shareable RWA & Community Action Kit"
+      subtitle={`One-click notices grounded in live ${telemetry.city} CPCB AQI (${telemetry.aqi})`}
+      icon={<MessageSquare className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />}
+      iconWrapperClassName="bg-emerald-500/10 border-2 border-emerald-400 text-emerald-400"
+      closeAriaLabel="Close RWA Kit"
+      maxWidthClassName="max-w-xl"
     >
-      <div className="w-full max-w-xl bg-[#0C121B] border-2 border-slate-700 rounded-xl brutal-shadow p-6 relative my-8">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400"
-          aria-label="Close RWA Kit"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 brutal-shadow-sm font-bold">
-            <MessageSquare className="w-5 h-5 stroke-[2.5]" aria-hidden="true" />
-          </div>
-          <div>
-            <h2 id="rwa-modal-title" className="text-base font-black uppercase tracking-wide text-white font-display">
-              Shareable RWA & Community Action Kit
-            </h2>
-            <p className="text-xs text-slate-400 font-mono">
-              One-click notices grounded in live {telemetry.city} CPCB AQI ({telemetry.aqi})
-            </p>
-          </div>
-        </div>
 
         {/* Tabs */}
         <div className="flex items-center gap-2 pb-3 border-b-2 border-slate-800">
@@ -185,7 +162,6 @@ Please reply with your Block/Flat number and daily route to match with nearby fa
             <span>{copied ? 'COPIED!' : 'COPY NOTICE'}</span>
           </button>
         </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 };

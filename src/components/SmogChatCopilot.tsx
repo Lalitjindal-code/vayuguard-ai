@@ -23,6 +23,13 @@ interface SmogChatCopilotProps {
   userApiKey?: string;
 }
 
+const QUICK_PROMPTS = [
+  'Is it safe for my 4-year-old to play outside at 4 PM today?',
+  'How do I make a ₹800 DIY air purifier for a 12x12 bedroom?',
+  'Draft a WhatsApp message for our RWA to stop morning leaf burning.',
+  'Which mask grade is best for motorcycle commute in AQI 400+?',
+] as const;
+
 export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
   profile,
   telemetry,
@@ -51,13 +58,6 @@ export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
     setMessages([buildWelcomeMessage(telemetry)]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [telemetry.city, telemetry.aqi]);
-
-  const quickPrompts = [
-    'Is it safe for my 4-year-old to play outside at 4 PM today?',
-    'How do I make a ₹800 DIY air purifier for a 12x12 bedroom?',
-    'Draft a WhatsApp message for our RWA to stop morning leaf burning.',
-    'Which mask grade is best for motorcycle commute in AQI 400+?',
-  ];
 
   // Auto-scroll to bottom of messages (with jsdom safety guard)
   useEffect(() => {
@@ -161,7 +161,7 @@ export const SmogChatCopilot: React.FC<SmogChatCopilotProps> = ({
             <span className="text-[11px] font-mono text-slate-400 font-bold uppercase tracking-wider mr-1">
               Suggested:
             </span>
-            {quickPrompts.map((chip, idx) => (
+            {QUICK_PROMPTS.map((chip, idx) => (
               <button
                 key={idx}
                 type="button"

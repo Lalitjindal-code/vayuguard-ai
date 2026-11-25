@@ -6,12 +6,9 @@
  */
 
 import { AirQualityTelemetry, AqiSeverity, HourlyForecastPoint } from '../types/airQuality';
+import { buildCityPresets, CityPreset } from '../data/cityPresets';
 
-export interface CityPreset {
-  name: string;
-  label: string;
-  telemetry: AirQualityTelemetry;
-}
+export type { CityPreset };
 
 /**
  * CPCB PM2.5 24h concentration breakpoints (µg/m³) per MoEFCC Gazette 2014.
@@ -181,6 +178,34 @@ export function calculateSeverity(aqi: number): {
 }
 
 /**
+ * Classifies an hour of day (0-23) into its diurnal thermal inversion risk,
+ * pollutant multiplier factor, and whether the safe ventilation window is active.
+ */
+function classifyDiurnalHour(hour: number): {
+  factor: number;
+  inversionRisk: 'Low' | 'Moderate' | 'High';
+  isSafeWindow: boolean;
+} {
+  if (hour >= 5 && hour <= 9) {
+    return { factor: DIURNAL_FACTORS.MORNING_TRAP, inversionRisk: 'High', isSafeWindow: false };
+  }
+  if (hour >= 12 && hour <= 16) {
+    return { factor: DIURNAL_FACTORS.SOLAR_WINDOW, inversionRisk: 'Low', isSafeWindow: true };
+  }
+  if (hour >= 19 && hour <= 23) {
+    return { factor: DIURNAL_FACTORS.EVENING_TRAP, inversionRisk: 'High', isSafeWindow: false };
+  }
+  return { factor: DIURNAL_FACTORS.TRANSITION, inversionRisk: 'Moderate', isSafeWindow: false };
+}
+
+/** Formats a 24-hour clock integer into a compact 12-hour label (e.g. "12 AM", "3 PM"). */
+function formatHourLabel(hour: number): string {
+  if (hour === 0) return '12 AM';
+  if (hour === 12) return '12 PM';
+  return hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
+}
+
+/**
  * Synthesizes a scientifically accurate 24-hour winter diurnal inversion curve
  * grounded in Indian CPCB NAQI standards.
  *
@@ -190,130 +215,25 @@ export function generateDiurnalHourlyCurve(basePm25: number): HourlyForecastPoin
   const points: HourlyForecastPoint[] = [];
 
   for (let hour = 0; hour < 24; hour++) {
-    let factor = 1.0;
-    let risk: 'Low' | 'Moderate' | 'High' = 'Moderate';
-    let isSafe = false;
-
-    // Peak Inversion Trap (Night ground cooling & morning rush: 05:00 - 09:30)
-    if (hour >= 5 && hour <= 9) {
-      factor = DIURNAL_FACTORS.MORNING_TRAP;
-      risk = 'High';
-    }
-    // Midday Solar Dispersion Window (12:00 - 16:00: Sun breaks boundary layer)
-    else if (hour >= 12 && hour <= 16) {
-      factor = DIURNAL_FACTORS.SOLAR_WINDOW;
-      risk = 'Low';
-      isSafe = true;
-    }
-    // Late Evening Stagnation Trap (19:00 - 23:00: Ground cools rapidly)
-    else if (hour >= 19 && hour <= 23) {
-      factor = DIURNAL_FACTORS.EVENING_TRAP;
-      risk = 'High';
-    } else {
-      factor = DIURNAL_FACTORS.TRANSITION;
-      risk = 'Moderate';
-    }
-
+    const { factor, inversionRisk, isSafeWindow } = classifyDiurnalHour(hour);
     const pm25 = Math.round(basePm25 * factor);
     const pm10 = Math.round(pm25 * 1.5);
     const { aqi } = calculateIndianCpcbAqi(pm25, pm10);
-    const displayHour = hour === 0 ? '12 AM' : hour === 12 ? '12 PM' : hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
 
     points.push({
-      time: displayHour,
+      time: formatHourLabel(hour),
       hour,
       aqi,
       pm25,
-      inversionRisk: risk,
-      isSafeWindow: isSafe,
+      inversionRisk,
+      isSafeWindow,
     });
   }
 
   return points;
 }
 
-export const CITY_PRESETS: CityPreset[] = [
-  {
-    name: 'Delhi NCR',
-    label: 'Delhi (CPCB 435)',
-    telemetry: {
-      city: 'Delhi NCR',
-      latitude: 28.6139,
-      longitude: 77.209,
-      aqi: 435,
-      pm25: 295,
-      pm10: 440,
-      severity: 'Severe',
-      cpcbCategory: 'Severe',
-      dominantPollutant: 'PM2.5',
-      inversionRisk: 'High',
-      safeVentilationWindow: '1:30 PM - 3:30 PM',
-      updatedAt: 'Live Telemetry',
-      isSimulated: true,
-      hourlyForecast: generateDiurnalHourlyCurve(295),
-    },
-  },
-  {
-    name: 'Bhopal',
-    label: 'Bhopal (CPCB 238)',
-    telemetry: {
-      city: 'Bhopal',
-      latitude: 23.2599,
-      longitude: 77.4126,
-      aqi: 238,
-      pm25: 142,
-      pm10: 210,
-      severity: 'Poor',
-      cpcbCategory: 'Poor',
-      dominantPollutant: 'PM2.5',
-      inversionRisk: 'Moderate',
-      safeVentilationWindow: '12:30 PM - 4:00 PM',
-      updatedAt: 'Live Telemetry',
-      isSimulated: true,
-      hourlyForecast: generateDiurnalHourlyCurve(142),
-    },
-  },
-  {
-    name: 'Mumbai',
-    label: 'Mumbai (CPCB 132)',
-    telemetry: {
-      city: 'Mumbai',
-      latitude: 19.076,
-      longitude: 72.8777,
-      aqi: 132,
-      pm25: 68,
-      pm10: 125,
-      severity: 'Moderate',
-      cpcbCategory: 'Moderate',
-      dominantPollutant: 'PM2.5',
-      inversionRisk: 'Moderate',
-      safeVentilationWindow: '11:00 AM - 4:30 PM',
-      updatedAt: 'Live Telemetry',
-      isSimulated: true,
-      hourlyForecast: generateDiurnalHourlyCurve(68),
-    },
-  },
-  {
-    name: 'Bengaluru',
-    label: 'Bengaluru (CPCB 42)',
-    telemetry: {
-      city: 'Bengaluru',
-      latitude: 12.9716,
-      longitude: 77.5946,
-      aqi: 42,
-      pm25: 14,
-      pm10: 38,
-      severity: 'Good',
-      cpcbCategory: 'Good',
-      dominantPollutant: 'PM10',
-      inversionRisk: 'Low',
-      safeVentilationWindow: '8:00 AM - 6:00 PM',
-      updatedAt: 'Live Telemetry',
-      isSimulated: true,
-      hourlyForecast: generateDiurnalHourlyCurve(14),
-    },
-  },
-];
+export const CITY_PRESETS: CityPreset[] = buildCityPresets(generateDiurnalHourlyCurve);
 
 /**
  * Fetches real-time AQI and 24h hourly forecast for any city worldwide,
@@ -380,21 +300,10 @@ export async function fetchCityTelemetry(
         const ptPm25 = Math.round(aqiData.hourly.pm2_5?.[idx] ?? pm25);
         const ptPm10 = Math.round(aqiData.hourly.pm10?.[idx] ?? pm10);
         const ptCalculated = calculateIndianCpcbAqi(ptPm25, ptPm10);
-
-        let ptRisk: 'Low' | 'Moderate' | 'High' = 'Moderate';
-        let isSafe = false;
-
-        if ((hour >= 5 && hour <= 9) || (hour >= 19 && hour <= 23)) {
-          ptRisk = 'High';
-        } else if (hour >= 12 && hour <= 16) {
-          ptRisk = 'Low';
-          isSafe = true;
-        }
-
-        const displayHour = hour === 0 ? '12 AM' : hour === 12 ? '12 PM' : hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
+        const { inversionRisk: ptRisk, isSafeWindow: isSafe } = classifyDiurnalHour(hour);
 
         return {
-          time: displayHour,
+          time: formatHourLabel(hour),
           hour,
           aqi: ptCalculated.aqi,
           pm25: ptPm25,
